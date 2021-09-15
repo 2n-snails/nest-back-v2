@@ -1,3 +1,4 @@
+import { Chat } from './chat.entity';
 import {
   Column,
   CreateDateColumn,
@@ -76,4 +77,10 @@ export class User {
 
   @OneToMany(() => State, (state) => state.user)
   state: State[];
+
+  @OneToMany(() => Chat, (chat) => chat.seller)
+  userSeller: Chat[];
+
+  @OneToMany(() => Chat, (chat) => chat.buyer)
+  userBuyer: Chat[];
 }
