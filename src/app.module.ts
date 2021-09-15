@@ -1,3 +1,4 @@
+import { Chat } from './entity/chat.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { State } from './entity/state.entity';
 import { Review } from 'src/entity/review.entity';
@@ -48,7 +49,7 @@ import { CommonModule } from './common/common.module';
       migrations: [__dirname + '/src/migrations/*.ts'],
       cli: { migrationsDir: 'src/migrations' },
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
       logging: true,
       keepConnectionAlive: true,
     }),
@@ -56,6 +57,7 @@ import { CommonModule } from './common/common.module';
       AddressArea,
       AddressCity,
       Category,
+      Chat,
       Comment,
       Deal,
       Image,
