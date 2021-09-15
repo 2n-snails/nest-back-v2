@@ -9,15 +9,12 @@ import { Deal } from './entity/deal.entity';
 import { User } from 'src/entity/user.entity';
 import { AddressCity } from 'src/entity/address_city.entity';
 import { AddressArea } from './entity/address_area.entity';
+import { Comment } from './entity/comment.entity';
+import { Image } from './entity/image.entity';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
-import {
-  forwardRef,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -69,7 +66,6 @@ import { ProductModule } from './product/product.module';
       User,
       Wish,
     ]),
-    forwardRef(() => ProductModule),
     AuthModule,
     RavenModule,
     UserModule,
