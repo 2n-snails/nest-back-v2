@@ -23,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
 import { RavenModule, RavenInterceptor } from 'nest-raven';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { ProductModule } from './product/product.module';
     RavenModule,
     UserModule,
     ProductModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [
