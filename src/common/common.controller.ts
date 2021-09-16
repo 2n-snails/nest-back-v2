@@ -1,6 +1,7 @@
 import { AddressCity } from './../entity/address_city.entity';
 import { CommonService } from './common.service';
 import { Controller, Get } from '@nestjs/common';
+import { Category } from 'src/entity/category.entity';
 
 @Controller('common')
 export class CommonController {
@@ -14,7 +15,7 @@ export class CommonController {
 
   // 가테고리 가져오기
   @Get('category')
-  getCategory() {
-    return;
+  async getCategory(): Promise<Category[]> {
+    return await this.commonService.getAllCategory();
   }
 }
