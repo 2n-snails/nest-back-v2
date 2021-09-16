@@ -1,16 +1,29 @@
-import { Controller, Get, Patch, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { KakaoAuthGuard } from 'src/auth/guard/kakao.auth.guard';
 
 @Controller('user')
 export class UserController {
   // 카카오 로그인 요청
+  @UseGuards(KakaoAuthGuard)
   @Get('auth/kakao')
   kakaoLogin() {
     return;
   }
   // 카카오 로그인 콜백
   @Get('auth/kakao/callback')
-  kakaocallback() {
-    return;
+  @UseGuards(KakaoAuthGuard)
+  kakaocallback(@Req() req, @Res() res: Response) {
+    res.cookie('access_token', req.user);
+    res.redirect(process.env.CLIENT_URL);
   }
 
   // 페이스북 로그인 요청
