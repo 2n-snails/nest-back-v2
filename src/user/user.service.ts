@@ -13,6 +13,10 @@ export class UserService {
     return await this.userReadService.findOneUserById(id);
   }
 
+  async findUserByUserNo(user_no: number | string): Promise<User | undefined> {
+    return await this.userReadService.findOneUserByUserNo(user_no);
+  }
+
   async joinUser(id: number | string, nick: string, provider: string) {
     return await this.userCreateService.createUser(id, nick, provider);
   }

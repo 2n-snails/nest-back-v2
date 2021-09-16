@@ -48,15 +48,15 @@ export class JwtAccessAuthGuard extends AuthGuard('jwt') {
       );
 
       if (time_remaining < 5) {
-        const user = await this.userService.findUserById(
-          token_verify.user_provider_id,
+        const user = await this.userService.findUserByUserNo(
+          token_verify.user_no,
         );
         // TODO: find Refresh Token and new Access Token Generate
         const new_access_token = await this.authService.createAccessToken(user);
         return new_access_token;
       }
-      const user = await this.userService.findUserById(
-        token_verify.user_provider_id,
+      const user = await this.userService.findUserByUserNo(
+        token_verify.user_no,
       );
       return user;
     } catch (error) {
