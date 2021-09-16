@@ -1,5 +1,16 @@
 import { ProductService } from './product.service';
-import { Controller, Delete, Get, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
 
 @Controller('product')
 export class ProductController {
@@ -12,9 +23,12 @@ export class ProductController {
   }
 
   // 상품 등록
-  @Post('/')
-  uploadProduct() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Post()
+  async uploadProduct(@Req() req, @Body() data) {
+    const user_no = req.user.user_no;
+    const result = await this.productService.createProduct(user_no, data);
+    return { success: result };
   }
 
   // 상품명 검색
