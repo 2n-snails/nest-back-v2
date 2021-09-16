@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Put,
@@ -45,15 +46,26 @@ export class ProductController {
   }
 
   // 상품 수정
+  @UseGuards(JwtAccessAuthGuard)
   @Put(':product_id')
-  modifyProduct() {
-    return;
+  async modifyProduct(@Req() req, @Body() data, @Param() param) {
+    const result = await this.productService.modifyProduct(
+      req.user,
+      data,
+      param.product_id,
+    );
+    return result ? { success: true } : { success: false };
   }
 
   // 상품 삭제
+  @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
-  deleteProduct() {
-    return;
+  async deleteProduct(@Req() req, @Param() param) {
+    const result = await this.productService.deleteProduct(
+      req.user,
+      param.product_id,
+    );
+    return result ? { success: true } : { success: false };
   }
 
   // 상품 상태 수정
