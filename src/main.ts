@@ -16,7 +16,7 @@ async function bootstrap() {
   });
   app.useGlobalInterceptors(new RavenInterceptor());
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v2');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
