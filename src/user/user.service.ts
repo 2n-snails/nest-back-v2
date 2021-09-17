@@ -79,4 +79,12 @@ export class UserService {
     const result = { user, reviewData };
     return result;
   }
+  async findMyPage(userId: number, state: string) {
+    const user = await this.userReadService.findMyInfoData(userId);
+    const queryData = await this.userReadService.findUserProductData(
+      userId,
+      state,
+    );
+    return { user, queryData };
+  }
 }

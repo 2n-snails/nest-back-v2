@@ -60,24 +60,23 @@ export class UserController {
   }
 
   // 내 상점 (판매물품, 판매완료, 구매내역, 찜한상품)
-  // ?standard={sell, sold, buy, wish}
+  // ?standard={sale, sold, buy, wish}
   @Get('mypage/:user_id')
   myPage(
     @Param() param: UserIdParam,
-    @Query('standard') standardQuery: MyPageStandardDTO,
-  ) {
+    @Query() standardQuery: MyPageStandardDTO,
+  ): any {
     const userId = param.user_id;
     const standard = standardQuery.standard;
-    if (standard === 'sell') {
-      return;
+    if (standard === 'sale') {
+      return this.userService.findMyPage(userId, 'sale');
     } else if (standard === 'sold') {
-      return;
+      return this.userService.findMyPage(userId, 'sold');
     } else if (standard === 'buy') {
-      return;
+      return this.userService.findMyPage(userId, 'buy');
     } else if (standard === 'wish') {
-      return;
+      return this.userService.findMyPage(userId, 'wish');
     }
-    return;
   }
 
   // 내 정보
