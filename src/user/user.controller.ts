@@ -1,3 +1,4 @@
+import { UpdateUserNickDto } from './dto/updateUserNick.dto';
 import { UpdateUserImageDto } from './dto/updateUserImage.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from './../auth/guard/jwt.access.guard';
@@ -99,9 +100,22 @@ export class UserController {
   }
 
   // 닉네임 수정
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
   @Patch('my-info/:user_id/nickname')
-  patchNickName() {
-    return;
+  async patchNickName(
+    @Req() req,
+    @Param() param: UserIdParam,
+    @Body() updateUserNickDto: UpdateUserNickDto,
+  ) {
+    const paramUserId = Number(param.user_id);
+    const tokenUserId = req.user.user_no;
+    const { userNick } = updateUserNickDto;
+
+    if (paramUserId === tokenUserId) {
+      return await this.userService.userNickUpdate(tokenUserId, userNick);
+    }
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   // 유저에게 달린 후기
