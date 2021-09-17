@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -18,9 +19,10 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   // 메인페이지 데이터
-  @Get('/')
-  mainPageData() {
-    return;
+  @Get()
+  async mainPageData(@Query() query) {
+    const data = await this.productService.getMainPageData(query);
+    return data;
   }
 
   // 상품 등록

@@ -1,4 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { Product } from 'src/entity/product.entity';
 import { User } from 'src/entity/user.entity';
 import { ProductCreateService } from './query/productCreate.query.service';
 import { ProductDeleteService } from './query/productDelete.query.service';
@@ -13,6 +14,11 @@ export class ProductService {
     private readonly productUpdateService: ProductUpdateService,
     private readonly productDeleteService: ProductDeleteService,
   ) {}
+  async getMainPageData(query: any) {
+    const data = await this.productReadService.findProducts(query);
+    return data;
+  }
+
   async createProduct(user_no: number, data: any) {
     const { product_title, product_content, product_price } = data;
     const product = await this.productCreateService.createProduct(

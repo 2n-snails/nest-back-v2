@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Comment } from './comment.entity';
@@ -14,6 +15,7 @@ import { Image } from './image.entity';
 import { ProductCategory } from './product_category.entity';
 import { User } from './user.entity';
 import { Wish } from './wish.entity';
+import { State } from './state.entity';
 
 @Entity()
 export class Product {
@@ -66,4 +68,7 @@ export class Product {
 
   @OneToMany(() => Chat, (chat) => chat.product)
   chats: Chat[];
+
+  @OneToOne(() => State, (state) => state.product)
+  state: State;
 }
