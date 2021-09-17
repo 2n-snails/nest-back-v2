@@ -1,4 +1,3 @@
-import { UpdateUserNickDto } from './../dto/updateUserNick.dto';
 import { User } from './../../entity/user.entity';
 import { getRepository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
