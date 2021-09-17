@@ -2,10 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 export class MyPageStandardDTO {
   @IsString()
-  @IsIn(['sell', 'sold', 'buy', 'wish'], {
-    message: 'sell, sold, buy, wish 만 입력 가능',
+  @IsIn(['sale', 'sold', 'buy', 'wish'], {
+    message: 'sale, sold, buy, wish 만 입력 가능',
   })
   @IsNotEmpty()
-  @ApiProperty({ enum: ['sell', 'sold', 'buy', 'wish'] })
+  @ApiProperty({ enum: ['sale', 'sold', 'buy', 'wish'] })
   standard: string;
 }
