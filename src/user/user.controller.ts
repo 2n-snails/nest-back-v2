@@ -1,3 +1,4 @@
+import { CreateReviewDto } from './dto/createReview.dto';
 import { UpdateUserNickDto } from './dto/updateUserNick.dto';
 import { UpdateUserImageDto } from './dto/updateUserImage.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -124,8 +125,20 @@ export class UserController {
     return;
   }
   // 후기 작성
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
   @Post('review/:user_id')
-  writeReview() {
-    return;
+  async writeReview(
+    @Req() req,
+    @Body() createReviewDto: CreateReviewDto,
+    @Param() param: UserIdParam,
+  ) {
+    const writer = req.user.user_no;
+    const receiver = Number(param.user_id);
+    return await this.userService.reviewWrite(
+      writer,
+      receiver,
+      createReviewDto,
+    );
   }
 }
