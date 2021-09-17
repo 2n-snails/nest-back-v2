@@ -1,6 +1,14 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAccessAuthGuard } from './../auth/guard/jwt.access.guard';
+import { User } from './../entity/user.entity';
+import { UserIdParam } from './dto/userIdParam.dto';
+import { UserService } from 'src/user/user.service';
 import {
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
+  Param,
   Patch,
   Post,
   Req,
@@ -12,6 +20,7 @@ import { KakaoAuthGuard } from 'src/auth/guard/kakao.auth.guard';
 
 @Controller('user')
 export class UserController {
+  constructor(private readonly userService: UserService) {}
   // 카카오 로그인 요청
   @UseGuards(KakaoAuthGuard)
   @Get('auth/kakao')
@@ -51,9 +60,21 @@ export class UserController {
   }
 
   // 내 정보
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
   @Get('my-info/:user_id')
-  getMyInfo() {
-    return;
+  async getMyInfo(
+    @Req() req,
+    @Param() param: UserIdParam,
+  ): Promise<User | undefined> {
+    const paramUserId = Number(param.user_id);
+    console.log(req.user);
+    const tokenUserId = req.user.user_no;
+
+    if (paramUserId === tokenUserId) {
+      return await this.userService.findMyInfo(tokenUserId);
+    }
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   // 프로필 사진 수정

@@ -19,4 +19,23 @@ export class UserReadService {
       .where(`user_no = :user_no`, { user_no: user_no })
       .getOne();
   }
+
+  async findMyInfoData(user_no: number): Promise<User> {
+    const result = await getRepository(User)
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.review_receiver', 'review')
+      .select([
+        'u.user_no',
+        'u.user_profile_image',
+        'u.user_nick',
+        'u.user_provider',
+        'u.createdAt',
+      ])
+      // 소수점 둘째 자리까지
+      .addSelect('AVG(review.review_score)::numeric(10,2)', 'reviewAvg')
+      .where(`u.user_no = ${user_no}`)
+      .groupBy('u.user_no')
+      .getRawOne();
+    return result;
+  }
 }
