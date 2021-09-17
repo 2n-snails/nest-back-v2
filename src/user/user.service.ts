@@ -20,4 +20,8 @@ export class UserService {
   async joinUser(id: number | string, nick: string, provider: string) {
     return await this.userCreateService.createUser(id, nick, provider);
   }
+
+  async findMyInfo(user_no: number): Promise<User | undefined> {
+    return await this.userReadService.findMyInfoData(user_no);
+  }
 }
