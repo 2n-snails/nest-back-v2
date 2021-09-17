@@ -1,4 +1,3 @@
-import { Review } from './../entity/review.entity';
 import { CreateReviewDto } from './dto/createReview.dto';
 import { UserDeleteService } from './query/userDelete.query.service';
 import { UserUpdateService } from './query/userUpdate.query.service';
