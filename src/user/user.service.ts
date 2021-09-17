@@ -1,5 +1,4 @@
 import { CreateReviewDto } from './dto/createReview.dto';
-import { UpdateUserNickDto } from './dto/updateUserNick.dto';
 import { UserDeleteService } from './query/userDelete.query.service';
 import { UserUpdateService } from './query/userUpdate.query.service';
 import { Injectable } from '@nestjs/common';
