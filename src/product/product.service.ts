@@ -71,4 +71,15 @@ export class ProductService {
     // TODO: 채팅방 구현시 채팅방도 삭제?
     return true;
   }
+
+  async searchProduct(query: any) {
+    return await this.productReadService.search(query);
+  }
+
+  async findOneProduct(product_id: number): Promise<Product> {
+    const product = await this.productReadService.findOneProduct(product_id);
+    // TODO: 댓글 목록 가져오기
+    // TODO: 판매자의 별점 구하기
+    return product;
+  }
 }

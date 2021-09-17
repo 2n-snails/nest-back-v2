@@ -37,14 +37,16 @@ export class ProductController {
   // 상품명 검색
   // ?prodcut-name={data}
   @Get('search')
-  searchProduct() {
-    return;
+  async searchProduct(@Query() query) {
+    const data = await this.productService.searchProduct(query);
+    return data;
   }
 
   // 상품 상세 페이지
   @Get(':product_id')
-  productDetail() {
-    return;
+  async productDetail(@Param() param) {
+    const data = await this.productService.findOneProduct(param.product_id);
+    return data;
   }
 
   // 상품 수정
