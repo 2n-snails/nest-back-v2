@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/entity/user.entity';
-import { getConnection, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 
 @Injectable()
 export class UserCreateService {
@@ -10,7 +10,6 @@ export class UserCreateService {
       .insert()
       .values({
         user_provider_id: `${id}`,
-        user_nick: nick,
         user_provider: provider,
       })
       .execute();
