@@ -15,7 +15,7 @@ export class ProductReadService {
   }
 
   async findProducts(query: any) {
-    const { page, limit, parent, child } = query;
+    const { page, limit, parent, child, title } = query;
     const total_count = await this.productTotalCount(query);
     const total_page = Math.ceil(total_count / limit);
     const index = (page - 1) * limit;
@@ -52,11 +52,13 @@ export class ProductReadService {
       })
       .leftJoinAndSelect('pc.category', 'category')
       .where('p.deleted = :value', { value: 'N' });
-    if (parent || child) {
+    if (parent || child || title) {
       if (parent) {
         products.andWhere(`category.category_parent_name like '%${parent}%'`);
-      } else {
+      } else if (child) {
         products.andWhere(`category.category_child_name like '%${child}%'`);
+      } else {
+        products.andWhere(`p.product_title like '%${title}%'`);
       }
     }
     const data = await products
@@ -70,23 +72,68 @@ export class ProductReadService {
   }
 
   async productTotalCount(query: any): Promise<number> {
-    const { parent, child } = query;
+    const { parent, child, title } = query;
     const count = await getRepository(Product)
       .createQueryBuilder('p')
       .where('p.deleted = :value', { value: 'N' });
-    if (parent || child) {
+    if (parent || child || title) {
       count
         .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
           value: 'N',
         })
         .leftJoin('pc.category', 'c');
       if (parent) {
-        count.andWhere(`c.category_parent_name like '${parent}%'`);
+        count.andWhere(`c.category_parent_name like '%${parent}%'`);
+      } else if (child) {
+        count.andWhere(`c.category_child_name like '%${child}%'`);
       } else {
-        count.andWhere(`c.category_child_name like '${child}%'`);
+        count.andWhere(`p.product_title like '%${title}%'`);
       }
     }
     const data = count.getCount();
     return data;
+  }
+
+  async search(query: any) {
+    return await this.findProducts(query);
+  }
+
+  async findOneProduct(product_id: number): Promise<Product> {
+    return await getRepository(Product)
+      .createQueryBuilder('p')
+      .select([
+        'p.product_no',
+        'p.product_title',
+        'p.product_content',
+        'p.product_price',
+        'p.product_view',
+        'p.createdAt',
+      ])
+      .addSelect(['u.user_no', 'u.user_nick', 'u.user_profile_image'])
+      .addSelect(['state.state_no', 'state.state'])
+      .addSelect(['img.image_no', 'img.image_src', 'img.image_order'])
+      .addSelect(['pc.product_category_no'])
+      .addSelect(['deal.deal_no'])
+      .leftJoin('p.user', 'u')
+      .leftJoin('p.state', 'state')
+      .leftJoin('p.images', 'img', 'img.deleted = :value', { value: 'N' })
+      .leftJoin('p.deals', 'deal', 'deal.deleted = :value', { value: 'N' })
+      .leftJoinAndSelect('deal.addressArea', 'area')
+      .leftJoinAndSelect('area.addressCity', 'city')
+      .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
+        value: 'N',
+      })
+      .leftJoinAndSelect('pc.category', 'category')
+      .loadRelationCountAndMap('p.wish_count', 'p.wishes', 'wish_count', (qb) =>
+        qb.where('wish_count.deleted = :value', { value: 'N' }),
+      )
+      .loadRelationCountAndMap(
+        'p.comment_count',
+        'p.comments',
+        'comment_count',
+        (qb) => qb.where('comment_count.deleted = :value', { value: 'N' }),
+      )
+      .where(`p.product_no = ${product_id}`)
+      .getOne();
   }
 }
