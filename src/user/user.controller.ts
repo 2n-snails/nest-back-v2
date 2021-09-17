@@ -1,9 +1,11 @@
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { UpdateUserImageDto } from './dto/updateUserImage.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from './../auth/guard/jwt.access.guard';
 import { User } from './../entity/user.entity';
 import { UserIdParam } from './dto/userIdParam.dto';
 import { UserService } from 'src/user/user.service';
 import {
+  Body,
   Controller,
   Get,
   HttpException,
@@ -18,6 +20,7 @@ import {
 import { Response } from 'express';
 import { KakaoAuthGuard } from 'src/auth/guard/kakao.auth.guard';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -68,7 +71,6 @@ export class UserController {
     @Param() param: UserIdParam,
   ): Promise<User | undefined> {
     const paramUserId = Number(param.user_id);
-    console.log(req.user);
     const tokenUserId = req.user.user_no;
 
     if (paramUserId === tokenUserId) {
@@ -78,9 +80,22 @@ export class UserController {
   }
 
   // 프로필 사진 수정
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
   @Patch('my-info/:user_id/image')
-  patchProfileImage() {
-    return;
+  async patchProfileImage(
+    @Req() req,
+    @Body() updateUserImageDto: UpdateUserImageDto,
+    @Param() param: UserIdParam,
+  ) {
+    const paramUserId = Number(param.user_id);
+    const tokenUserId = req.user.user_no;
+    const { image } = updateUserImageDto;
+
+    if (paramUserId === tokenUserId) {
+      return await this.userService.userProfileImageUpdate(tokenUserId, image);
+    }
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   // 닉네임 수정
