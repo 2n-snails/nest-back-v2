@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Comment } from 'src/entity/comment.entity';
 import { Product } from 'src/entity/product.entity';
 import { getRepository } from 'typeorm';
 
@@ -135,5 +136,16 @@ export class ProductReadService {
       )
       .where(`p.product_no = ${product_id}`)
       .getOne();
+  }
+
+  async findAllProductComment(product_id: number): Promise<Comment[]> {
+    return await getRepository(Comment)
+      .createQueryBuilder('c')
+      .select(['c.comment_no', 'c.comment_content', 'c.createdAt'])
+      .addSelect(['re.recomment_no', 're.recomment_content', 're.createdAt'])
+      .leftJoin('c.recomments', 're', 're.deleted = :value', { value: 'N' })
+      .where('c.deleted = :value', { value: 'N' })
+      .andWhere(`c.product = ${product_id}`)
+      .getMany();
   }
 }

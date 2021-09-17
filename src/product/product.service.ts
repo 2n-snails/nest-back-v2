@@ -76,10 +76,13 @@ export class ProductService {
     return await this.productReadService.search(query);
   }
 
-  async findOneProduct(product_id: number): Promise<Product> {
+  async findOneProduct(product_id: number) {
     const product = await this.productReadService.findOneProduct(product_id);
     // TODO: 댓글 목록 가져오기
-    // TODO: 판매자의 별점 구하기
-    return product;
+    const comment = await this.productReadService.findAllProductComment(
+      product_id,
+    );
+    // TODO: 판매자의 별점 구하기 -> 분리 안함
+    return { product, comment };
   }
 }
