@@ -1,3 +1,4 @@
+import { Review } from './../entity/review.entity';
 import { CreateReviewDto } from './dto/createReview.dto';
 import { UserDeleteService } from './query/userDelete.query.service';
 import { UserUpdateService } from './query/userUpdate.query.service';
@@ -70,5 +71,13 @@ export class UserService {
     if (result) {
       return { success: true, message: '후기 작성 성공' };
     }
+  }
+  async findUserReview(paramUserId: number): Promise<any> {
+    const reviewData = await this.userReadService.findUserReviewData(
+      paramUserId,
+    );
+    const user = await this.userReadService.findMyInfoData(paramUserId);
+    const result = { user, reviewData };
+    return result;
   }
 }
