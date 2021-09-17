@@ -1,3 +1,4 @@
+import { CreateReviewDto } from './dto/createReview.dto';
 import { UpdateUserNickDto } from './dto/updateUserNick.dto';
 import { UserDeleteService } from './query/userDelete.query.service';
 import { UserUpdateService } from './query/userUpdate.query.service';
@@ -51,6 +52,24 @@ export class UserService {
       return { success: true, message: '닉네임 업데이트 성공' };
     } else {
       return { success: false, message: '닉네임 업데이트 실패' };
+    }
+  }
+
+  async reviewWrite(
+    writer: number,
+    receiver: number,
+    createReviewDto: CreateReviewDto,
+  ) {
+    const { content, reviewScore, product_no } = createReviewDto;
+    const result = await this.userCreateService.reviewWriteData(
+      writer,
+      receiver,
+      content,
+      reviewScore,
+      product_no,
+    );
+    if (result) {
+      return { success: true, message: '후기 작성 성공' };
     }
   }
 }
