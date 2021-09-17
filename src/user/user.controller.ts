@@ -121,9 +121,11 @@ export class UserController {
 
   // 유저에게 달린 후기
   @Get('review/:user_id')
-  getReview() {
-    return;
+  async getReview(@Req() req, @Param() param: UserIdParam): Promise<any> {
+    const paramUserId = Number(param.user_id);
+    return await this.userService.findUserReview(paramUserId);
   }
+
   // 후기 작성
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)

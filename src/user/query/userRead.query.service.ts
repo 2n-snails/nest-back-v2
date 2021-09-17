@@ -38,4 +38,22 @@ export class UserReadService {
       .getRawOne();
     return result;
   }
+  async findUserReviewData(paramUserId: number): Promise<User[] | undefined> {
+    const result = await getRepository(User)
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.review_receiver', 'review')
+      .leftJoinAndSelect('review.writer', 'reviewWriter')
+      .where(`u.user_no = ${paramUserId}`)
+      .select([
+        'u.user_no',
+        'review.product_no',
+        'review.review_content',
+        'review.createdAt',
+        'reviewWriter.user_no',
+        'reviewWriter.user_profile_image',
+        'reviewWriter.user_nick',
+      ])
+      .getMany();
+    return result;
+  }
 }
