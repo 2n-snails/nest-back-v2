@@ -1,3 +1,4 @@
+import { MyPageStandardDTO } from './dto/myPageStandard.dto';
 import { CreateReviewDto } from './dto/createReview.dto';
 import { UpdateUserNickDto } from './dto/updateUserNick.dto';
 import { UpdateUserImageDto } from './dto/updateUserImage.dto';
@@ -15,6 +16,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -58,9 +60,23 @@ export class UserController {
   }
 
   // 내 상점 (판매물품, 판매완료, 구매내역, 찜한상품)
-  // ?data={sell, sold, buy, wish}
+  // ?standard={sell, sold, buy, wish}
   @Get('mypage/:user_id')
-  myPage() {
+  myPage(
+    @Param() param: UserIdParam,
+    @Query('standard') standardQuery: MyPageStandardDTO,
+  ) {
+    const userId = param.user_id;
+    const standard = standardQuery.standard;
+    if (standard === 'sell') {
+      return;
+    } else if (standard === 'sold') {
+      return;
+    } else if (standard === 'buy') {
+      return;
+    } else if (standard === 'wish') {
+      return;
+    }
     return;
   }
 
