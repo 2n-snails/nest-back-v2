@@ -1,6 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Product } from 'src/entity/product.entity';
 import { User } from 'src/entity/user.entity';
+import { UserService } from 'src/user/user.service';
+import { resourceLimits } from 'worker_threads';
 import { ProductCreateService } from './query/productCreate.query.service';
 import { ProductDeleteService } from './query/productDelete.query.service';
 import { ProductReadService } from './query/productRead.query.service';
@@ -13,6 +15,7 @@ export class ProductService {
     private readonly productReadService: ProductReadService,
     private readonly productUpdateService: ProductUpdateService,
     private readonly productDeleteService: ProductDeleteService,
+    private readonly userService: UserService,
   ) {}
   async getMainPageData(query: any) {
     const data = await this.productReadService.findProducts(query);
@@ -84,5 +87,18 @@ export class ProductService {
     );
     // TODO: 판매자의 별점 구하기 -> 분리 안함
     return { product, comment };
+  }
+
+  async changeProductState(product_id: number, query: any) {
+    const { state, user_no } = query;
+    const user = await this.userService.findUserByUserNo(user_no);
+    const result = await this.productUpdateService.productStateUpdate(
+      product_id,
+      state,
+      user,
+    );
+    return result.affected
+      ? { success: true, message: '상품 상태 수정 성공' }
+      : { success: false, message: '상품 상태 수정 실패' };
   }
 }

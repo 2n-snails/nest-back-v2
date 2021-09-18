@@ -73,9 +73,13 @@ export class ProductController {
   }
 
   // 상품 상태 수정
+  // state={ reservation, sold_out }, user_no
   @Patch(':product_id')
-  changeProductState() {
-    return;
+  async changeProductState(@Param() param, @Query() query) {
+    return await this.productService.changeProductState(
+      param.product_id,
+      query,
+    );
   }
 
   // 상품 찜하기

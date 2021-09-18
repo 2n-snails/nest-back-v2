@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from 'src/entity/product.entity';
 import { State } from 'src/entity/state.entity';
+import { User } from 'src/entity/user.entity';
 import { getRepository } from 'typeorm';
 
 @Injectable()
@@ -19,12 +20,9 @@ export class ProductUpdateService {
       .execute();
   }
 
-  async productStateUpdate(product_no: number, state: string) {
-    return await getRepository(State)
-      .createQueryBuilder()
-      .update()
-      .set({ state })
-      .where('product = :value', { value: product_no })
-      .execute();
+  async productStateUpdate(product_no: number, state: string, user?: User) {
+    const qb = getRepository(State).createQueryBuilder().update();
+    user ? qb.set({ state, user }) : qb.set({ state });
+    return qb.where('product = :value', { value: product_no }).execute();
   }
 }
