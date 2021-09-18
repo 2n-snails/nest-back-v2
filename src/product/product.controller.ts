@@ -15,10 +15,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
+import { UserReadService } from 'src/user/query/userRead.query.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly userReadService: UserReadService,
+  ) {}
 
   // 메인페이지 데이터
   @Get()
@@ -123,9 +127,7 @@ export class ProductController {
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
-    await this.productService.wishProduct(param.product_id, req.user.user_no);
-    // await this.productService.createWish(param.product_id, req.user.user_no);
+    await this.productService.createWish(param.product_id, req.user.user_no);
     return { success: true, message: '상품 찜 추가 성공' };
   }
 

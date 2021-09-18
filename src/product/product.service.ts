@@ -113,11 +113,6 @@ export class ProductService {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
-  // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
-  async wishProduct(product_id: number, user: number): Promise<Wish> {
-    return await this.productCreateService.createWishData(product_id, user);
-  }
-
   async deletedWish(product_id: number, user: number) {
     return await this.productDeleteService.deleteWishData(product_id, user);
   }
