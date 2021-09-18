@@ -6,6 +6,7 @@ import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
 import { ProductCategory } from 'src/entity/product_category.entity';
 import { State } from 'src/entity/state.entity';
+import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
 
 @Injectable()
@@ -70,5 +71,12 @@ export class ProductCreateService {
       });
     }
     return true;
+  }
+
+  async createWishData(product: any, user: any) {
+    return await getRepository(Wish).save({
+      user,
+      product,
+    });
   }
 }

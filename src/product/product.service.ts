@@ -85,4 +85,8 @@ export class ProductService {
     // TODO: 판매자의 별점 구하기 -> 분리 안함
     return { product, comment };
   }
+
+  async wishProduct(product_id: number, user: number) {
+    return await this.productCreateService.createWishData(product_id, user);
+  }
 }
