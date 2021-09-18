@@ -68,15 +68,8 @@ export class UserController {
   ): any {
     const userId = param.user_id;
     const standard = standardQuery.standard;
-    if (standard === 'sale') {
-      return this.userService.findMyPage(userId, 'sale');
-    } else if (standard === 'sold') {
-      return this.userService.findMyPage(userId, 'sold');
-    } else if (standard === 'buy') {
-      return this.userService.findMyPage(userId, 'buy');
-    } else if (standard === 'wish') {
-      return this.userService.findMyPage(userId, 'wish');
-    }
+
+    return this.userService.findMyPage(userId, standard);
   }
 
   // 내 정보
