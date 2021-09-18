@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -53,6 +55,7 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Put(':product_id')
   async modifyProduct(@Req() req, @Body() data, @Param() param) {
+    // TODO: modifyProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
     const result = await this.productService.modifyProduct(
       req.user,
       data,
@@ -65,6 +68,7 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
   async deleteProduct(@Req() req, @Param() param) {
+    // TODO: deleteProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
     const result = await this.productService.deleteProduct(
       req.user,
       param.product_id,
@@ -74,8 +78,15 @@ export class ProductController {
 
   // 상품 상태 수정
   // state={ reservation, sold_out }, user_no
+  @UseGuards(JwtAccessAuthGuard)
   @Patch(':product_id')
-  async changeProductState(@Param() param, @Query() query) {
+  async changeProductState(@Req() req, @Param() param, @Query() query) {
+    const seller = await this.productService.findProductSeller(
+      param.product_id,
+    );
+    if (seller.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
     return await this.productService.changeProductState(
       param.product_id,
       query,
