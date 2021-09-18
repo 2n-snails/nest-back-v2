@@ -105,4 +105,8 @@ export class ProductService {
   async findProductSeller(product_id: number) {
     return await this.productReadService.findSellerProduct(product_id);
   }
+
+  async wishProduct(product_id: number, user: number) {
+    return await this.productCreateService.createWishData(product_id, user);
+  }
 }
