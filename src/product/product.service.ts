@@ -1,8 +1,6 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { Product } from 'src/entity/product.entity';
+import { Injectable } from '@nestjs/common';
 import { User } from 'src/entity/user.entity';
 import { UserService } from 'src/user/user.service';
-import { resourceLimits } from 'worker_threads';
 import { ProductCreateService } from './query/productCreate.query.service';
 import { ProductDeleteService } from './query/productDelete.query.service';
 import { ProductReadService } from './query/productRead.query.service';
@@ -42,6 +40,7 @@ export class ProductService {
   }
 
   async modifyProduct(user: User, data: any, product_id: number) {
+    // TODO: 밑에 3줄 삭제 예정
     const product = await this.productReadService.findSellerProduct(product_id);
     if (user.user_no !== product.user.user_no) {
       return false;
@@ -62,6 +61,7 @@ export class ProductService {
   }
 
   async deleteProduct(user: User, product_id: number) {
+    // TODO: 밑에 3줄 삭제 예정
     const product = await this.productReadService.findSellerProduct(product_id);
     if (user.user_no !== product.user.user_no) {
       return false;
@@ -100,5 +100,9 @@ export class ProductService {
     return result.affected
       ? { success: true, message: '상품 상태 수정 성공' }
       : { success: false, message: '상품 상태 수정 실패' };
+  }
+
+  async findProductSeller(product_id: number) {
+    return await this.productReadService.findSellerProduct(product_id);
   }
 }
