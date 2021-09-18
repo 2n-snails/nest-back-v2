@@ -15,10 +15,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
+import { UserReadService } from 'src/user/query/userRead.query.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly userReadService: UserReadService,
+  ) {}
 
   // 메인페이지 데이터
   @Get()
@@ -94,9 +98,11 @@ export class ProductController {
   }
 
   // 상품 찜하기
+  @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
-  wishProduct() {
-    return;
+  async wishProduct(@Req() req, @Param('product_id') param: number) {
+    //TODO: 찜 했는지 체크 필요.
+    return await this.productService.wishProduct(param, req.user.user_no);
   }
 
   // 상품 찜 취소
