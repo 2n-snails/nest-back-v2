@@ -186,9 +186,24 @@ export class ProductController {
   }
 
   // 상품 대댓글 작성
-  @Post(':product_id/recomment')
-  writeProductRecomment() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Post(':comment_id/recomment')
+  async writeProductRecomment(@Req() req, @Body() data, @Param() param) {
+    const comment_check = await this.productService.checkCommentWriter(
+      param.comment_id,
+    );
+    if (!comment_check) {
+      return {
+        success: false,
+        message: '삭제된 댓글 또는 잘못된 댓글 번호 입니다.',
+      };
+    }
+    await this.productService.createReComment(
+      req.user.user_no,
+      data,
+      param.comment_id,
+    );
+    return { success: true, message: '대댓글 작성 성공' };
   }
 
   // 상품 대댓글 삭제
