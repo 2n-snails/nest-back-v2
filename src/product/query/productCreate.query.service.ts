@@ -6,6 +6,7 @@ import { Deal } from 'src/entity/deal.entity';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
 import { ProductCategory } from 'src/entity/product_category.entity';
+import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
@@ -96,6 +97,23 @@ export class ProductCreateService {
         comment_content,
         user,
         product,
+      });
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async createReCommentData(
+    user: any,
+    data: any,
+    comment: any,
+  ): Promise<ReComment> {
+    try {
+      const { recomment_content } = data;
+      return await getRepository(ReComment).save({
+        recomment_content,
+        user,
+        comment,
       });
     } catch (e) {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
