@@ -98,6 +98,12 @@ export class ProductController {
     const product_check = await this.productService.checkProductState(
       param.product_id,
     );
+    if (!product_check) {
+      return {
+        success: false,
+        message: `${param.product_id}번 상품이 존재하지 않습니다.`,
+      };
+    }
     if (
       product_check.state !== 'sale' &&
       product_check.state !== 'reservation'
