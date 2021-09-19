@@ -123,9 +123,9 @@ export class ProductController {
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    // TODO: createWish 인가 wishProduct 인가? 
-    // await this.productService.createWish(param.product_id, req.user.user_no);
+    // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
     await this.productService.wishProduct(param.product_id, req.user.user_no);
+    // await this.productService.createWish(param.product_id, req.user.user_no);
     return { success: true, message: '상품 찜 추가 성공' };
   }
 
