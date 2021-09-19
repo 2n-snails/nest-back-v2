@@ -168,4 +168,12 @@ export class ProductService {
       comment_no,
     );
   }
+
+  async checkReComment(recomment_no: number): Promise<ReComment> {
+    return await this.productReadService.findReCommentData(recomment_no);
+  }
+
+  async deleteReComment(recomment_no: number) {
+    return await this.productDeleteService.deleteReCommentData(recomment_no);
+  }
 }
