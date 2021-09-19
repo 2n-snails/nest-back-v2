@@ -1,5 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { Product } from 'src/entity/product.entity';
+import { Injectable } from '@nestjs/common';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
