@@ -4,6 +4,7 @@ import { Deal } from 'src/entity/deal.entity';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
 import { ProductCategory } from 'src/entity/product_category.entity';
+import { ReComment } from 'src/entity/recomment.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
 
@@ -66,6 +67,19 @@ export class ProductDeleteService {
         .update()
         .set({ deleted: 'Y' })
         .where('comment_no = :comment_no', { comment_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteReCommentData(recomment_no) {
+    try {
+      return await getRepository(ReComment)
+        .createQueryBuilder()
+        .update()
+        .set({ deleted: 'Y' })
+        .where('recomment_no = :recomment_no', { recomment_no })
         .execute();
     } catch (e) {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Comment } from 'src/entity/comment.entity';
 import { Product } from 'src/entity/product.entity';
+import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
@@ -189,6 +190,21 @@ export class ProductReadService {
         .leftJoin('c.user', 'u')
         .where('c.comment_no = :comment_no', { comment_no })
         .andWhere('c.deleted = :value', { value: 'N' })
+        .getOne();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findReCommentData(recomment_no: number): Promise<ReComment> {
+    try {
+      return await getRepository(ReComment)
+        .createQueryBuilder('rc')
+        .select()
+        .addSelect(['u.user_no'])
+        .leftJoin('rc.user', 'u')
+        .where('rc.recomment_no = :recomment_no', { recomment_no })
+        .andWhere('rc.deleted = :value', { value: 'N' })
         .getOne();
     } catch (e) {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
