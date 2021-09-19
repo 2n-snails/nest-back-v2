@@ -15,14 +15,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
-import { UserReadService } from 'src/user/query/userRead.query.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService,
-    private readonly userReadService: UserReadService,
-  ) {}
+  constructor(private readonly productService: ProductService) {}
 
   // 메인페이지 데이터
   @Get()
@@ -100,12 +96,33 @@ export class ProductController {
   // 상품 찜하기
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
-  async wishProduct(@Req() req, @Param('product_id') param: number) {
-    //TODO: 찜 했는지 체크 필요.
-    return await this.productService.wishProduct(param, req.user.user_no);
+  async wishProduct(@Req() req, @Param() param) {
+    const product_check = await this.productService.checkProductState(
+      param.product_id,
+    );
+    if (
+      product_check.state !== 'sale' &&
+      product_check.state !== 'reservation'
+    ) {
+      return {
+        success: false,
+        message: '삭제, 판매 완료된 상품은 찜목록에 추가할 수 없습니다.',
+      };
+    }
+
+    const wish_check = await this.productService.checkProductWishList(
+      param.product_id,
+      req.user.user_no,
+    );
+    if (wish_check) {
+      return { success: false, message: '이미 찜한 상품입니다.' };
+    }
+    await this.productService.wishProduct(param.product_id, req.user.user_no);
+    return { success: true, message: '상품 찜 추가 성공' };
   }
 
   // 상품 찜 취소
+  @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
   deleteProductWish() {
     return;

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/entity/user.entity';
 import { UserService } from 'src/user/user.service';
+import { State } from 'src/entity/state.entity';
+import { User } from 'src/entity/user.entity';
+import { Wish } from 'src/entity/wish.entity';
 import { ProductCreateService } from './query/productCreate.query.service';
 import { ProductDeleteService } from './query/productDelete.query.service';
 import { ProductReadService } from './query/productRead.query.service';
@@ -106,7 +108,21 @@ export class ProductService {
     return await this.productReadService.findSellerProduct(product_id);
   }
 
-  async wishProduct(product_id: number, user: number) {
+  async wishProduct(product_id: number, user: number): Promise<Wish> {
     return await this.productCreateService.createWishData(product_id, user);
+  }
+
+  async checkProductState(product_id: number): Promise<State> {
+    return await this.productReadService.findProductStateData(product_id);
+  }
+
+  async checkProductWishList(
+    product_id: number,
+    user_no: number,
+  ): Promise<Wish> {
+    return await this.productReadService.findProductWishListData(
+      product_id,
+      user_no,
+    );
   }
 }
