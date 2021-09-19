@@ -117,15 +117,28 @@ export class ProductController {
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    await this.productService.wishProduct(param.product_id, req.user.user_no);
+    await this.productService.createWish(param.product_id, req.user.user_no);
     return { success: true, message: '상품 찜 추가 성공' };
   }
 
   // 상품 찜 취소
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
-  deleteProductWish() {
-    return;
+  async deleteProductWish(@Req() req, @Param() param) {
+    const wish_check = await this.productService.checkProductWishList(
+      param.product_id,
+      req.user.user_no,
+    );
+    if (!wish_check) {
+      return { success: false, message: '찜 목록에 없는 상품입니다.' };
+    }
+    const result = await this.productService.deletedWish(
+      param.product_id,
+      req.user.user_no,
+    );
+    return result.affected
+      ? { success: true, message: '찜 취소하기 성공' }
+      : { success: false, message: '찜 취소 실패' };
   }
 
   // 상품 댓글 작성
