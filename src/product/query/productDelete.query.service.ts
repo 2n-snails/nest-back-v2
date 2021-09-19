@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Comment } from 'src/entity/comment.entity';
 import { Deal } from 'src/entity/deal.entity';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
@@ -52,6 +53,19 @@ export class ProductDeleteService {
         .set({ deleted: 'Y' })
         .where('product = :product', { product: product_no })
         .andWhere('user = :user', { user: user_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteCommentData(comment_no: number) {
+    try {
+      return await getRepository(Comment)
+        .createQueryBuilder()
+        .update()
+        .set({ deleted: 'Y' })
+        .where('comment_no = :comment_no', { comment_no })
         .execute();
     } catch (e) {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
