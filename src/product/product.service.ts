@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Comment } from 'src/entity/comment.entity';
 import { ReComment } from 'src/entity/recomment.entity';
 import { UserService } from 'src/user/user.service';
+import { Comment } from 'src/entity/comment.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
