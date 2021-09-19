@@ -220,8 +220,26 @@ export class ProductController {
   }
 
   // 상품 대댓글 삭제
-  @Delete(':product_id/recomment')
-  deleteProductRecomment() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete(':recomment_id/recomment')
+  async deleteProductRecomment(@Req() req, @Param() param) {
+    const recomment_check = await this.productService.checkReComment(
+      param.recomment_id,
+    );
+    if (!recomment_check) {
+      return {
+        success: false,
+        message: '삭제된 댓글 또는 잘못된 댓글 번호 입니다.',
+      };
+    }
+    if (recomment_check.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    const result = await this.productService.deleteReComment(
+      param.recomment_id,
+    );
+    return result.affected
+      ? { success: true, message: '대댓글 삭제 성공' }
+      : { success: false, message: '대댓글 삭제 실패' };
   }
 }
