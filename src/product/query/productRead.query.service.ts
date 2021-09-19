@@ -161,6 +161,7 @@ export class ProductReadService {
         .select()
         .where('w.product = :product_no', { product_no: product_id })
         .andWhere('w.user = :user_no', { user_no })
+        .andWhere('w.deleted = :value', { value: 'N' })
         .getOne();
     } catch (e) {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);

@@ -109,8 +109,16 @@ export class ProductService {
     return await this.productReadService.findSellerProduct(product_id);
   }
 
+  async createWish(product_id: number, user: number): Promise<Wish> {
+    return await this.productCreateService.createWishData(product_id, user);
+  }
+
   async wishProduct(product_id: number, user: number): Promise<Wish> {
     return await this.productCreateService.createWishData(product_id, user);
+  }
+
+  async deletedWish(product_id: number, user: number) {
+    return await this.productDeleteService.deleteWishData(product_id, user);
   }
 
   async checkProductState(product_id: number): Promise<State> {
