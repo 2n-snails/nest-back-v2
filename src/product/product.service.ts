@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { Comment } from 'src/entity/comment.entity';
+import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
@@ -149,5 +150,17 @@ export class ProductService {
 
   async deleteComment(comment_no: number) {
     return await this.productDeleteService.deleteCommentData(comment_no);
+  }
+
+  async createReComment(
+    user_no: number,
+    data: any,
+    comment_no: number,
+  ): Promise<ReComment> {
+    return await this.productCreateService.createReCommentData(
+      user_no,
+      data,
+      comment_no,
+    );
   }
 }
