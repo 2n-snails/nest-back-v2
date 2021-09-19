@@ -88,8 +88,12 @@ export class ProductService {
     return { product, comment };
   }
 
-  async wishProduct(product_id: number, user: number): Promise<Wish> {
+  async createWish(product_id: number, user: number): Promise<Wish> {
     return await this.productCreateService.createWishData(product_id, user);
+  }
+
+  async deletedWish(product_id: number, user: number) {
+    return await this.productDeleteService.deleteWishData(product_id, user);
   }
 
   async checkProductState(product_id: number): Promise<State> {
