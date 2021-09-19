@@ -5,6 +5,8 @@ import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
+import { MainPageDto } from '../dto/mainpage.dto';
+import { SearchDto } from '../dto/search.dto';
 
 @Injectable()
 export class ProductReadService {
@@ -98,7 +100,7 @@ export class ProductReadService {
     return data;
   }
 
-  async search(query: any) {
+  async search(query: SearchDto) {
     return await this.findProducts(query);
   }
 

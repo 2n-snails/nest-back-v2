@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -13,22 +15,44 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { MainPageDto } from './dto/mainpage.dto';
+import { CreateProductDto } from './dto/createProduct.dto';
+import { SearchDto } from './dto/search.dto';
+import { ProductIdParamDto } from './dto/product.param.dto';
+import { CommentIdParamDto } from './dto/comment.param.dto';
+import { ReCommentIdParamDto } from './dto/recomment.param.dto';
+import { UpdateProductDto } from './dto/updateProduct.dto';
 
+@ApiTags('product')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   // 메인페이지 데이터
+  @ApiOperation({
+    summary: '메인페이지 데이터 조회',
+    description: `쿼리 옵션은 limit, page필수 parent, child는 하나만 선택
+
+    기본 : ?limit={data}&page={data}
+    상위 카테고리 기준 : ?limit={data}&page={data}&parent={data}
+    하위 카테고리 기준 : ?limit={data}&page={data}&child={data}`,
+  })
   @Get()
-  async mainPageData(@Query() query) {
+  async mainPageData(@Query() query: MainPageDto) {
     const data = await this.productService.getMainPageData(query);
     return data;
   }
 
   // 상품 등록
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 등록하기',
+    description: '상품 등록 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Post()
-  async uploadProduct(@Req() req, @Body() data) {
+  async uploadProduct(@Req() req, @Body() data: CreateProductDto) {
     const user_no = req.user.user_no;
     const result = await this.productService.createProduct(user_no, data);
     return { success: result };
@@ -36,23 +60,40 @@ export class ProductController {
 
   // 상품명 검색
   // ?prodcut-name={data}
+  @ApiOperation({
+    summary: '상품 검색',
+    description: '상품 검색 컨트롤러',
+  })
   @Get('search')
-  async searchProduct(@Query() query) {
+  async searchProduct(@Query() query: SearchDto) {
     const data = await this.productService.searchProduct(query);
     return data;
   }
 
   // 상품 상세 페이지
+  @ApiOperation({
+    summary: '상품 상세 정보',
+    description: '상품 상세 정보 컨트롤러',
+  })
   @Get(':product_id')
-  async productDetail(@Param() param) {
+  async productDetail(@Param() param: ProductIdParamDto) {
     const data = await this.productService.findOneProduct(param.product_id);
     return data;
   }
 
   // 상품 수정
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 수정하기',
+    description: '상품 수정 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Put(':product_id')
-  async modifyProduct(@Req() req, @Body() data, @Param() param) {
+  async modifyProduct(
+    @Req() req,
+    @Body() data: UpdateProductDto,
+    @Param() param: ProductIdParamDto,
+  ) {
     // TODO: modifyProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
     const result = await this.productService.modifyProduct(
       req.user,
@@ -65,7 +106,7 @@ export class ProductController {
   // 상품 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
-  async deleteProduct(@Req() req, @Param() param) {
+  async deleteProduct(@Req() req, @Param() param: ProductIdParamDto) {
     // TODO: deleteProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
     const result = await this.productService.deleteProduct(
       req.user,
@@ -78,7 +119,11 @@ export class ProductController {
   // state={ reservation, sold_out }, user_no
   @UseGuards(JwtAccessAuthGuard)
   @Patch(':product_id')
-  async changeProductState(@Req() req, @Param() param, @Query() query) {
+  async changeProductState(
+    @Req() req,
+    @Param() param: ProductIdParamDto,
+    @Query() query,
+  ) {
     const seller = await this.productService.findProductSeller(
       param.product_id,
     );
@@ -94,7 +139,7 @@ export class ProductController {
   // 상품 찜하기
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
-  async wishProduct(@Req() req, @Param() param) {
+  async wishProduct(@Req() req, @Param() param: ProductIdParamDto) {
     const product_check = await this.productService.checkProductState(
       param.product_id,
     );
@@ -128,7 +173,7 @@ export class ProductController {
   // 상품 찜 취소
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
-  async deleteProductWish(@Req() req, @Param() param) {
+  async deleteProductWish(@Req() req, @Param() param: ProductIdParamDto) {
     const wish_check = await this.productService.checkProductWishList(
       param.product_id,
       req.user.user_no,
@@ -148,7 +193,11 @@ export class ProductController {
   // 상품 댓글 작성
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/comment')
-  async writeProductComment(@Req() req, @Body() data, @Param() param) {
+  async writeProductComment(
+    @Req() req,
+    @Body() data,
+    @Param() param: ProductIdParamDto,
+  ) {
     const product_check = await this.productService.checkProductState(
       param.product_id,
     );
@@ -176,7 +225,7 @@ export class ProductController {
   // 상품 댓글 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':comment_id/comment')
-  async deleteProductComment(@Req() req, @Param() param) {
+  async deleteProductComment(@Req() req, @Param() param: CommentIdParamDto) {
     const comment_check = await this.productService.checkCommentWriter(
       param.comment_id,
     );
@@ -199,7 +248,11 @@ export class ProductController {
   // 상품 대댓글 작성
   @UseGuards(JwtAccessAuthGuard)
   @Post(':comment_id/recomment')
-  async writeProductRecomment(@Req() req, @Body() data, @Param() param) {
+  async writeProductRecomment(
+    @Req() req,
+    @Body() data,
+    @Param() param: CommentIdParamDto,
+  ) {
     const comment_check = await this.productService.checkCommentWriter(
       param.comment_id,
     );
@@ -220,7 +273,10 @@ export class ProductController {
   // 상품 대댓글 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':recomment_id/recomment')
-  async deleteProductRecomment(@Req() req, @Param() param) {
+  async deleteProductRecomment(
+    @Req() req,
+    @Param() param: ReCommentIdParamDto,
+  ) {
     const recomment_check = await this.productService.checkReComment(
       param.recomment_id,
     );

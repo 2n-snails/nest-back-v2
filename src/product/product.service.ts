@@ -9,6 +9,13 @@ import { ProductCreateService } from './query/productCreate.query.service';
 import { ProductDeleteService } from './query/productDelete.query.service';
 import { ProductReadService } from './query/productRead.query.service';
 import { ProductUpdateService } from './query/productUpdate.query.service';
+import { MainPageDto } from './dto/mainpage.dto';
+import { CreateProductDto } from './dto/createProduct.dto';
+import { SearchDto } from './dto/search.dto';
+import { UpdateProductDto } from './dto/updateProduct.dto';
+import { ProductIdParamDto } from './dto/product.param.dto';
+import { CommentIdParamDto } from './dto/comment.param.dto';
+import { ReCommentIdParamDto } from './dto/recomment.param.dto';
 
 @Injectable()
 export class ProductService {
@@ -19,12 +26,12 @@ export class ProductService {
     private readonly productDeleteService: ProductDeleteService,
     private readonly userService: UserService,
   ) {}
-  async getMainPageData(query: any) {
+  async getMainPageData(query: MainPageDto) {
     const data = await this.productReadService.findProducts(query);
     return data;
   }
 
-  async createProduct(user_no: number, data: any) {
+  async createProduct(user_no: number, data: CreateProductDto) {
     const { product_title, product_content, product_price } = data;
     const product = await this.productCreateService.createProduct(
       product_title,
@@ -43,7 +50,11 @@ export class ProductService {
     return true;
   }
 
-  async modifyProduct(user: User, data: any, product_id: number) {
+  async modifyProduct(
+    user: User,
+    data: UpdateProductDto,
+    product_id: ProductIdParamDto['product_id'],
+  ) {
     const product = await this.productReadService.findSellerProduct(product_id);
     if (user.user_no !== product.user.user_no) {
       return false;
@@ -63,7 +74,7 @@ export class ProductService {
     return true;
   }
 
-  async deleteProduct(user: User, product_id: number) {
+  async deleteProduct(user: User, product_id: ProductIdParamDto['product_id']) {
     const product = await this.productReadService.findSellerProduct(product_id);
     if (user.user_no !== product.user.user_no) {
       return false;
@@ -77,11 +88,11 @@ export class ProductService {
     return true;
   }
 
-  async searchProduct(query: any) {
+  async searchProduct(query: SearchDto) {
     return await this.productReadService.search(query);
   }
 
-  async findOneProduct(product_id: number) {
+  async findOneProduct(product_id: ProductIdParamDto['product_id']) {
     const product = await this.productReadService.findOneProduct(product_id);
     // TODO: 댓글 목록 가져오기
     const comment = await this.productReadService.findAllProductComment(
@@ -91,7 +102,10 @@ export class ProductService {
     return { product, comment };
   }
 
-  async changeProductState(product_id: number, query: any) {
+  async changeProductState(
+    product_id: ProductIdParamDto['product_id'],
+    query: any,
+  ) {
     const { state, user_no } = query;
     const user = await this.userService.findUserByUserNo(user_no);
     const result = await this.productUpdateService.productStateUpdate(
@@ -104,29 +118,29 @@ export class ProductService {
       : { success: false, message: '상품 상태 수정 실패' };
   }
 
-  async findProductSeller(product_id: number) {
+  async findProductSeller(product_id: ProductIdParamDto['product_id']) {
     return await this.productReadService.findSellerProduct(product_id);
   }
 
-  async createWish(product_id: number, user: number): Promise<Wish> {
+  async createWish(
+    product_id: ProductIdParamDto['product_id'],
+    user: number,
+  ): Promise<Wish> {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
-  // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
-  async wishProduct(product_id: number, user: number): Promise<Wish> {
-    return await this.productCreateService.createWishData(product_id, user);
-  }
-
-  async deletedWish(product_id: number, user: number) {
+  async deletedWish(product_id: ProductIdParamDto['product_id'], user: number) {
     return await this.productDeleteService.deleteWishData(product_id, user);
   }
 
-  async checkProductState(product_id: number): Promise<State> {
+  async checkProductState(
+    product_id: ProductIdParamDto['product_id'],
+  ): Promise<State> {
     return await this.productReadService.findProductStateData(product_id);
   }
 
   async checkProductWishList(
-    product_id: number,
+    product_id: ProductIdParamDto['product_id'],
     user_no: number,
   ): Promise<Wish> {
     return await this.productReadService.findProductWishListData(
@@ -138,7 +152,7 @@ export class ProductService {
   async createComment(
     data: any,
     user: number,
-    product_id: number,
+    product_id: ProductIdParamDto['product_id'],
   ): Promise<Comment> {
     return await this.productCreateService.createCommentData(
       data,
@@ -147,18 +161,18 @@ export class ProductService {
     );
   }
 
-  async checkCommentWriter(comment_no: number) {
+  async checkCommentWriter(comment_no: CommentIdParamDto['comment_id']) {
     return await this.productReadService.findCommentWriterData(comment_no);
   }
 
-  async deleteComment(comment_no: number) {
+  async deleteComment(comment_no: CommentIdParamDto['comment_id']) {
     return await this.productDeleteService.deleteCommentData(comment_no);
   }
 
   async createReComment(
     user_no: number,
     data: any,
-    comment_no: number,
+    comment_no: CommentIdParamDto['comment_id'],
   ): Promise<ReComment> {
     return await this.productCreateService.createReCommentData(
       user_no,
@@ -167,11 +181,13 @@ export class ProductService {
     );
   }
 
-  async checkReComment(recomment_no: number): Promise<ReComment> {
+  async checkReComment(
+    recomment_no: ReCommentIdParamDto['recomment_id'],
+  ): Promise<ReComment> {
     return await this.productReadService.findReCommentData(recomment_no);
   }
 
-  async deleteReComment(recomment_no: number) {
+  async deleteReComment(recomment_no: ReCommentIdParamDto['recomment_id']) {
     return await this.productDeleteService.deleteReCommentData(recomment_no);
   }
 }
