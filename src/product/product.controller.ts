@@ -146,9 +146,31 @@ export class ProductController {
   }
 
   // 상품 댓글 작성
+  @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/comment')
-  writeProductComment() {
-    return;
+  async writeProductComment(@Req() req, @Body() data, @Param() param) {
+    const product_check = await this.productService.checkProductState(
+      param.product_id,
+    );
+    if (!product_check) {
+      return {
+        success: false,
+        message: `${param.product_id}번 상품이 존재하지 않습니다.`,
+      };
+    }
+    if (product_check.state === 'delete') {
+      return {
+        success: false,
+        message: '삭제된 상품에는 댓글을 작성할 수 없습니다.',
+      };
+    }
+
+    await this.productService.createComment(
+      data,
+      req.user.user_no,
+      param.product_id,
+    );
+    return { success: true, message: '댓글 작성 성공' };
   }
 
   // 상품 댓글 삭제
