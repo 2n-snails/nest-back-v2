@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AddressArea } from 'src/entity/address_area.entity';
 import { Category } from 'src/entity/category.entity';
+import { Comment } from 'src/entity/comment.entity';
 import { Deal } from 'src/entity/deal.entity';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
@@ -76,6 +77,23 @@ export class ProductCreateService {
   async createWishData(product: any, user: any): Promise<Wish> {
     try {
       return await getRepository(Wish).save({
+        user,
+        product,
+      });
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async createCommentData(
+    data: any,
+    user: any,
+    product: any,
+  ): Promise<Comment> {
+    try {
+      const { comment_content } = data;
+      return await getRepository(Comment).save({
+        comment_content,
         user,
         product,
       });
