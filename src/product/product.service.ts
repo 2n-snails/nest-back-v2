@@ -147,4 +147,12 @@ export class ProductService {
       product_id,
     );
   }
+
+  async checkCommentWriter(comment_no: number) {
+    return await this.productReadService.findCommentWriterData(comment_no);
+  }
+
+  async deleteComment(comment_no: number) {
+    return await this.productDeleteService.deleteCommentData(comment_no);
+  }
 }
