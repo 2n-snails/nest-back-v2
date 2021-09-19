@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -161,9 +163,26 @@ export class ProductController {
   }
 
   // 상품 댓글 삭제
-  @Delete(':product_id/comment')
-  deleteProductComment() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete(':comment_id/comment')
+  async deleteProductComment(@Req() req, @Param() param) {
+    const comment_check = await this.productService.checkCommentWriter(
+      param.comment_id,
+    );
+    if (!comment_check) {
+      return {
+        success: false,
+        message: '이미 삭제된 댓글이거나 존재하지 않는 댓글입니다.',
+      };
+    }
+    console.log(comment_check);
+    if (comment_check.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    const result = await this.productService.deleteComment(param.comment_id);
+    return result.affected
+      ? { success: true, message: '댓글 삭제 성공' }
+      : { success: false, message: '댓글 삭제 실패' };
   }
 
   // 상품 대댓글 작성
