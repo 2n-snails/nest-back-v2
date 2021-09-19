@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ReComment } from 'src/entity/recomment.entity';
-import { UserService } from 'src/user/user.service';
 import { Comment } from 'src/entity/comment.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
+import { UserService } from 'src/user/user.service';
 import { ProductCreateService } from './query/productCreate.query.service';
 import { ProductDeleteService } from './query/productDelete.query.service';
 import { ProductReadService } from './query/productRead.query.service';
@@ -44,7 +44,6 @@ export class ProductService {
   }
 
   async modifyProduct(user: User, data: any, product_id: number) {
-    // TODO: 밑에 3줄 삭제 예정
     const product = await this.productReadService.findSellerProduct(product_id);
     if (user.user_no !== product.user.user_no) {
       return false;
@@ -65,7 +64,6 @@ export class ProductService {
   }
 
   async deleteProduct(user: User, product_id: number) {
-    // TODO: 밑에 3줄 삭제 예정
     const product = await this.productReadService.findSellerProduct(product_id);
     if (user.user_no !== product.user.user_no) {
       return false;
