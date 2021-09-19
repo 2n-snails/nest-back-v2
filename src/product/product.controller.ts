@@ -15,14 +15,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
-import { UserReadService } from 'src/user/query/userRead.query.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService,
-    private readonly userReadService: UserReadService,
-  ) {}
+  constructor(private readonly productService: ProductService) {}
 
   // 메인페이지 데이터
   @Get()
