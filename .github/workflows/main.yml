@@ -33,8 +33,8 @@ jobs:
         run: |
           mkdir secret
           cd secret
-          touch .env.production
-          cat << EOF >> .env.production
+          touch .env.development
+          cat << EOF >> .env.development
           ${{ secrets.ENV }}
           EOF
           cd ../
