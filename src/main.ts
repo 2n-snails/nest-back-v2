@@ -4,11 +4,25 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as Sentry from '@sentry/node';
 import { RavenInterceptor } from 'nest-raven';
+import * as fs from 'fs';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  let app;
+
+  if (process.env.NODE_ENV === 'development') {
+    app = await NestFactory.create(AppModule, { cors: true });
+  } else if (process.env.NODE_ENV === 'production') {
+    const httpsOptions = {
+      key: fs.readFileSync(process.env.HTTPS_KEY),
+      cert: fs.readFileSync(process.env.HTTPS_CERT),
+    };
+    app = await NestFactory.create(AppModule, {
+      cors: true,
+      httpsOptions,
+    });
+  }
   const port = process.env.SERVICE_PORT || 4000;
 
   Sentry.init({
