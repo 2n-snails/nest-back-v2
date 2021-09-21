@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -121,7 +123,9 @@ export class ProductController {
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    await this.productService.createWish(param.product_id, req.user.user_no);
+    // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
+    await this.productService.wishProduct(param.product_id, req.user.user_no);
+    // await this.productService.createWish(param.product_id, req.user.user_no);
     return { success: true, message: '상품 찜 추가 성공' };
   }
 
@@ -146,15 +150,54 @@ export class ProductController {
   }
 
   // 상품 댓글 작성
+  @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/comment')
-  writeProductComment() {
-    return;
+  async writeProductComment(@Req() req, @Body() data, @Param() param) {
+    const product_check = await this.productService.checkProductState(
+      param.product_id,
+    );
+    if (!product_check) {
+      return {
+        success: false,
+        message: `${param.product_id}번 상품이 존재하지 않습니다.`,
+      };
+    }
+    if (product_check.state === 'delete') {
+      return {
+        success: false,
+        message: '삭제된 상품에는 댓글을 작성할 수 없습니다.',
+      };
+    }
+
+    await this.productService.createComment(
+      data,
+      req.user.user_no,
+      param.product_id,
+    );
+    return { success: true, message: '댓글 작성 성공' };
   }
 
   // 상품 댓글 삭제
-  @Delete(':product_id/comment')
-  deleteProductComment() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete(':comment_id/comment')
+  async deleteProductComment(@Req() req, @Param() param) {
+    const comment_check = await this.productService.checkCommentWriter(
+      param.comment_id,
+    );
+    if (!comment_check) {
+      return {
+        success: false,
+        message: '이미 삭제된 댓글이거나 존재하지 않는 댓글입니다.',
+      };
+    }
+    console.log(comment_check);
+    if (comment_check.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    const result = await this.productService.deleteComment(param.comment_id);
+    return result.affected
+      ? { success: true, message: '댓글 삭제 성공' }
+      : { success: false, message: '댓글 삭제 실패' };
   }
 
   // 상품 대댓글 작성

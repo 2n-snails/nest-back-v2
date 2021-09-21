@@ -179,4 +179,19 @@ export class ProductReadService {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async findCommentWriterData(comment_no: number): Promise<Comment> {
+    try {
+      return await getRepository(Comment)
+        .createQueryBuilder('c')
+        .select()
+        .addSelect(['u.user_no'])
+        .leftJoin('c.user', 'u')
+        .where('c.comment_no = :comment_no', { comment_no })
+        .andWhere('c.deleted = :value', { value: 'N' })
+        .getOne();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

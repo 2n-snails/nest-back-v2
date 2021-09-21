@@ -1,6 +1,6 @@
 import { UserService } from 'src/user/user.service';
-import { HttpException, Injectable } from '@nestjs/common';
-import { Product } from 'src/entity/product.entity';
+import { Injectable } from '@nestjs/common';
+import { Comment } from 'src/entity/comment.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
@@ -113,6 +113,7 @@ export class ProductService {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
+  // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
   async wishProduct(product_id: number, user: number): Promise<Wish> {
     return await this.productCreateService.createWishData(product_id, user);
   }
@@ -133,5 +134,25 @@ export class ProductService {
       product_id,
       user_no,
     );
+  }
+
+  async createComment(
+    data: any,
+    user: number,
+    product_id: number,
+  ): Promise<Comment> {
+    return await this.productCreateService.createCommentData(
+      data,
+      user,
+      product_id,
+    );
+  }
+
+  async checkCommentWriter(comment_no: number) {
+    return await this.productReadService.findCommentWriterData(comment_no);
+  }
+
+  async deleteComment(comment_no: number) {
+    return await this.productDeleteService.deleteCommentData(comment_no);
   }
 }
