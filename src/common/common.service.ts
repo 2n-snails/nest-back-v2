@@ -9,7 +9,6 @@ export class CommonService {
     const result = await getRepository(AddressCity)
       .createQueryBuilder('city')
       .leftJoinAndSelect('city.addressAreas', 'area')
-      .select(['city.city_name', 'area.area_name'])
       .getMany();
     return result;
   }
@@ -17,7 +16,6 @@ export class CommonService {
   async getAllCategory(): Promise<Category[]> {
     const result = await getRepository(Category)
       .createQueryBuilder('category')
-      .select(['category.category_name'])
       .getMany();
     return result;
   }
