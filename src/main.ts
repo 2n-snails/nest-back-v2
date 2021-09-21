@@ -4,7 +4,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as Sentry from '@sentry/node';
 import { RavenInterceptor } from 'nest-raven';
-import * as fs from 'fs';
 
 declare const module: any;
 
