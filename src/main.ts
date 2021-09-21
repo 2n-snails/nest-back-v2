@@ -9,14 +9,7 @@ import * as fs from 'fs';
 declare const module: any;
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync(process.env.HTTPS_KEY),
-    cert: fs.readFileSync(process.env.HTTPS_CERT),
-  };
-  const app = await NestFactory.create(AppModule, {
-    cors: true,
-    httpsOptions,
-  });
+  const app = await NestFactory.create(AppModule, { cors: true });
   const port = process.env.SERVICE_PORT || 4000;
 
   Sentry.init({
