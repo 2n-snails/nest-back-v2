@@ -20,31 +20,43 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductImage(product_no: Product['product_no']) {
-    return await getRepository(Image)
-      .createQueryBuilder()
-      .update()
-      .set({ deleted: 'Y' })
-      .where('product = :value', { value: product_no })
-      .execute();
+  async deleteProductImageData(product_no: Product['product_no']) {
+    try {
+      return await getRepository(Image)
+        .createQueryBuilder()
+        .update()
+        .set({ deleted: 'Y' })
+        .where('product = :value', { value: product_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  async deleteProductCategory(product_no: Product['product_no']) {
-    return await getRepository(ProductCategory)
-      .createQueryBuilder()
-      .update()
-      .set({ deleted: 'Y' })
-      .where('product = :value', { value: product_no })
-      .execute();
+  async deleteProductCategoryData(product_no: Product['product_no']) {
+    try {
+      return await getRepository(ProductCategory)
+        .createQueryBuilder()
+        .update()
+        .set({ deleted: 'Y' })
+        .where('product = :value', { value: product_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  async deleteProductDeal(product_no: Product['product_no']) {
-    return await getRepository(Deal)
-      .createQueryBuilder()
-      .update()
-      .set({ deleted: 'Y' })
-      .where('product = :value', { value: product_no })
-      .execute();
+  async deleteProductDealData(product_no: Product['product_no']) {
+    try {
+      return await getRepository(Deal)
+        .createQueryBuilder()
+        .update()
+        .set({ deleted: 'Y' })
+        .where('product = :value', { value: product_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async deleteWishData(

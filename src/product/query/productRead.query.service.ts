@@ -12,14 +12,18 @@ import { SearchDto } from '../dto/search.dto';
 
 @Injectable()
 export class ProductReadService {
-  async findSellerProduct(product_no: Product['product_no']) {
-    const seller = await getRepository(Product)
-      .createQueryBuilder('p')
-      .innerJoinAndSelect('p.user', 'u')
-      .select()
-      .where('p.product_no = :value', { value: product_no })
-      .getOne();
-    return seller;
+  async findSellerProductData(product_no: Product['product_no']) {
+    try {
+      const seller = await getRepository(Product)
+        .createQueryBuilder('p')
+        .innerJoinAndSelect('p.user', 'u')
+        .select()
+        .where('p.product_no = :value', { value: product_no })
+        .getOne();
+      return seller;
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findProducts(query: FindProductsDto) {

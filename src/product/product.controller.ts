@@ -97,13 +97,21 @@ export class ProductController {
     @Body() data: UpdateProductDto,
     @Param() param: ProductIdParamDto,
   ) {
-    // TODO: modifyProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
+    const product_check = await this.productService.findProductSeller(
+      param.product_id,
+    );
+    if (req.user.user_no !== product_check.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+
     const result = await this.productService.modifyProduct(
-      req.user,
+      product_check,
       data,
       param.product_id,
     );
-    return result ? { success: true } : { success: false };
+    return result
+      ? { success: true, message: '수정 성공' }
+      : { success: false, message: '수정 실패' };
   }
 
   // 상품 삭제

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Product } from 'src/entity/product.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
@@ -8,21 +8,25 @@ import { UpdateProductDto } from '../dto/updateProduct.dto';
 
 @Injectable()
 export class ProductUpdateService {
-  async productUpdate(
+  async productUpdateData(
     data: UpdateProductDto,
     product_no: Product['product_no'],
   ) {
-    const { product_title, product_content, product_price } = data;
-    return await getRepository(Product)
-      .createQueryBuilder()
-      .update()
-      .set({
-        product_title,
-        product_content,
-        product_price,
-      })
-      .where('product_no = :value', { value: product_no })
-      .execute();
+    try {
+      const { product_title, product_content, product_price } = data;
+      return await getRepository(Product)
+        .createQueryBuilder()
+        .update()
+        .set({
+          product_title,
+          product_content,
+          product_price,
+        })
+        .where('product_no = :value', { value: product_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async productStateUpdate(
