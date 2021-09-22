@@ -3,7 +3,7 @@ import { MyPageStandardDTO } from './dto/myPageStandard.dto';
 import { CreateReviewDto } from './dto/createReview.dto';
 import { UpdateUserNickDto } from './dto/updateUserNick.dto';
 import { UpdateUserImageDto } from './dto/updateUserImage.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from './../auth/guard/jwt.access.guard';
 import { User } from './../entity/user.entity';
 import { UserIdParam } from './dto/userIdParam.dto';
@@ -29,13 +29,21 @@ import { KakaoAuthGuard } from 'src/auth/guard/kakao.auth.guard';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  // 카카오 로그인 요청
+
+  @ApiOperation({
+    summary: `카카오 로그인`,
+    description: `카카오 로그인 요청 라우터`,
+  })
   @UseGuards(KakaoAuthGuard)
   @Get('auth/kakao')
   kakaoLogin() {
     return;
   }
-  // 카카오 로그인 콜백
+
+  @ApiOperation({
+    summary: `카카오 로그인 콜백`,
+    description: `카카오 로그인 요청시 콜백 라우터`,
+  })
   @Get('auth/kakao/callback')
   @UseGuards(KakaoAuthGuard)
   kakaocallback(@Req() req, @Res() res: Response) {
@@ -43,13 +51,20 @@ export class UserController {
     res.redirect(process.env.CLIENT_URL);
   }
 
-  // 페이스북 로그인 요청
+  @ApiOperation({
+    summary: `페이스북 로그인`,
+    description: `페이스북 로그인 요청 라우터`,
+  })
   @UseGuards(FacebookAuthGuard)
   @Get('auth/facebook')
   facebookLogin() {
     return;
   }
-  // 페이스북 로그인 콜백
+
+  @ApiOperation({
+    summary: `페이스북 로그인 콜백`,
+    description: `페이스북 로그인 요청시 콜백 라우터`,
+  })
   @UseGuards(FacebookAuthGuard)
   @Get('auth/facebook/callback')
   facebookcallback(@Req() req, @Res() res: Response) {
@@ -63,8 +78,11 @@ export class UserController {
     return { success: true, message: 'new accessToken Issuance success' };
   }
 
-  // 내 상점 (판매물품, 판매완료, 구매내역, 찜한상품)
   // ?standard={sale, sold, buy, wish}
+  @ApiOperation({
+    summary: `유저의 상점`,
+    description: `유저 상점의 판매물품, 판매완료, 구매내역, 찜한상품 요청 라우터 (수정 예정)`,
+  })
   @Get('mypage/:user_id')
   myPage(
     @Param() param: UserIdParam,
@@ -76,8 +94,11 @@ export class UserController {
     return this.userService.findMyPage(userId, standard);
   }
 
-  // 내 정보
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: `내 정보`,
+    description: `내 정보 요청 라우터`,
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Get('my-info/:user_id')
   async getMyInfo(
@@ -93,8 +114,11 @@ export class UserController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  // 프로필 사진 수정
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: `프로필 사진 수정`,
+    description: `프로필 사진 수정시 요청 라우터`,
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Patch('my-info/:user_id/image')
   async patchProfileImage(
@@ -112,8 +136,11 @@ export class UserController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  // 닉네임 수정
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: `닉네임 수정`,
+    description: `닉네임 수정시 요청 라우터`,
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Patch('my-info/:user_id/nickname')
   async patchNickName(
@@ -131,15 +158,21 @@ export class UserController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  // 유저에게 달린 후기
+  @ApiOperation({
+    summary: `유저의 후기`,
+    description: `유저에게 달린 후기 요청 라우터`,
+  })
   @Get('review/:user_id')
   async getReview(@Req() req, @Param() param: UserIdParam): Promise<any> {
     const paramUserId = Number(param.user_id);
     return await this.userService.findUserReview(paramUserId);
   }
 
-  // 후기 작성
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: `후기 작성`,
+    description: `어떤 상품에 대해 다른 유저에게 후기 작성 라우터`,
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Post('review/:user_id')
   async writeReview(
@@ -157,6 +190,10 @@ export class UserController {
   }
 
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: `로그아웃`,
+    description: `유저 로그아웃`,
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Get('logout')
   async logout(@Req() req: any) {
@@ -169,6 +206,10 @@ export class UserController {
   }
 
   @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: `회원 탈퇴`,
+    description: `유저 회원 탈퇴 요청 라우터`,
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Get('resign')
   async resign(@Req() req: any) {
