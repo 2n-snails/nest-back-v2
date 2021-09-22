@@ -23,6 +23,9 @@ import { ProductIdParamDto } from './dto/product.param.dto';
 import { CommentIdParamDto } from './dto/comment.param.dto';
 import { ReCommentIdParamDto } from './dto/recomment.param.dto';
 import { UpdateProductDto } from './dto/updateProduct.dto';
+import { ChangeProductStateDto } from './dto/chageProduct.dto';
+import { CreateCommentDto } from './dto/createComment.dto';
+import { CreateReCommentDto } from './dto/createReComment.dto';
 
 @ApiTags('product')
 @Controller('product')
@@ -116,13 +119,13 @@ export class ProductController {
   }
 
   // 상품 상태 수정
-  // state={ reservation, sold_out }, user_no
+  // state={ reservation, sold }, user_no
   @UseGuards(JwtAccessAuthGuard)
   @Patch(':product_id')
   async changeProductState(
     @Req() req,
     @Param() param: ProductIdParamDto,
-    @Query() query,
+    @Query() query: ChangeProductStateDto,
   ) {
     const seller = await this.productService.findProductSeller(
       param.product_id,
@@ -195,7 +198,7 @@ export class ProductController {
   @Post(':product_id/comment')
   async writeProductComment(
     @Req() req,
-    @Body() data,
+    @Body() data: CreateCommentDto,
     @Param() param: ProductIdParamDto,
   ) {
     const product_check = await this.productService.checkProductState(
@@ -250,7 +253,7 @@ export class ProductController {
   @Post(':comment_id/recomment')
   async writeProductRecomment(
     @Req() req,
-    @Body() data,
+    @Body() data: CreateReCommentDto,
     @Param() param: CommentIdParamDto,
   ) {
     const comment_check = await this.productService.checkCommentWriter(
