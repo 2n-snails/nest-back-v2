@@ -167,4 +167,16 @@ export class UserController {
     }
     throw new HttpException('server Error', HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('resign')
+  async resign(@Req() req: any) {
+    const userId = req.user.user_no;
+    const result = await this.userService.deleteUser(userId);
+    if (result.affected) {
+      return { success: true, message: '유저 삭제 성공' };
+    }
+    throw new HttpException('server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }

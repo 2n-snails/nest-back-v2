@@ -92,4 +92,9 @@ export class UserService {
     const queryData = await this.userUpdateService.userLogoutData(userId);
     return queryData;
   }
+
+  async deleteUser(userId: number) {
+    const queryData = await this.userUpdateService.deleteUserData(userId);
+    return queryData;
+  }
 }
