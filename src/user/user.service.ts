@@ -87,4 +87,9 @@ export class UserService {
     );
     return { user, queryData };
   }
+
+  async logoutUser(userId: number) {
+    const queryData = await this.userUpdateService.userLogoutData(userId);
+    return queryData;
+  }
 }

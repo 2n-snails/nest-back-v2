@@ -25,4 +25,15 @@ export class UserUpdateService {
       .execute();
     return result;
   }
+
+  async userLogoutData(user_no: number) {
+    const result = await getRepository(User)
+      .createQueryBuilder()
+      .update({
+        user_refresh_token: 'none',
+      })
+      .where(`user_no = ${user_no}`)
+      .execute();
+    return result;
+  }
 }
