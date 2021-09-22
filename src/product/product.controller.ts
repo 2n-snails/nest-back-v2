@@ -107,6 +107,11 @@ export class ProductController {
   }
 
   // 상품 삭제
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 삭제',
+    description: '상품 삭제 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
   async deleteProduct(@Req() req, @Param() param: ProductIdParamDto) {
@@ -120,6 +125,11 @@ export class ProductController {
 
   // 상품 상태 수정
   // state={ reservation, sold }, user_no
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 상태 수정하기',
+    description: '상품 상태 수정 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Patch(':product_id')
   async changeProductState(
@@ -140,6 +150,11 @@ export class ProductController {
   }
 
   // 상품 찜하기
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 찜하기',
+    description: '상품 찜하기 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
   async wishProduct(@Req() req, @Param() param: ProductIdParamDto) {
@@ -174,6 +189,11 @@ export class ProductController {
   }
 
   // 상품 찜 취소
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 찜 취소하기',
+    description: '상품 찜 취소 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
   async deleteProductWish(@Req() req, @Param() param: ProductIdParamDto) {
@@ -194,6 +214,11 @@ export class ProductController {
   }
 
   // 상품 댓글 작성
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 댓글 작성하기',
+    description: '상품 댓글 작성 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/comment')
   async writeProductComment(
@@ -226,6 +251,11 @@ export class ProductController {
   }
 
   // 상품 댓글 삭제
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 댓글 삭제하기',
+    description: '상품 댓글 삭제 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':comment_id/comment')
   async deleteProductComment(@Req() req, @Param() param: CommentIdParamDto) {
@@ -249,6 +279,11 @@ export class ProductController {
   }
 
   // 상품 대댓글 작성
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 대댓글 작성',
+    description: '상품 대댓글 작성 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Post(':comment_id/recomment')
   async writeProductRecomment(
@@ -274,6 +309,11 @@ export class ProductController {
   }
 
   // 상품 대댓글 삭제
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '상품 대댓글 삭제하기',
+    description: '상품 대댓글 삭제 컨트롤러',
+  })
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':recomment_id/recomment')
   async deleteProductRecomment(
