@@ -96,7 +96,7 @@ export class ProductService {
 
   // 상품 검색하기
   async searchProduct(query: SearchDto) {
-    return await this.productReadService.search(query);
+    return await this.productReadService.searchData(query);
   }
 
   // 상품 상세정보 받기

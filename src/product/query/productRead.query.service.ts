@@ -114,7 +114,7 @@ export class ProductReadService {
     return data;
   }
 
-  async search(query: SearchDto) {
+  async searchData(query: SearchDto) {
     return await this.findProducts(query);
   }
 
