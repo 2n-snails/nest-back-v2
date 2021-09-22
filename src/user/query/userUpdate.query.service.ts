@@ -36,4 +36,15 @@ export class UserUpdateService {
       .execute();
     return result;
   }
+
+  async deleteUserData(user_no: number) {
+    const result = await getRepository(User)
+      .createQueryBuilder()
+      .update({
+        deleted: 'Y',
+      })
+      .where(`user_no = ${user_no}`)
+      .execute();
+    return result;
+  }
 }
