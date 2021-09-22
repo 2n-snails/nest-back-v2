@@ -138,55 +138,66 @@ export class ProductReadService {
   async findOneProductData(
     product_id: Product['product_no'],
   ): Promise<Product> {
-    return await getRepository(Product)
-      .createQueryBuilder('p')
-      .select([
-        'p.product_no',
-        'p.product_title',
-        'p.product_content',
-        'p.product_price',
-        'p.product_view',
-        'p.createdAt',
-      ])
-      .addSelect(['u.user_no', 'u.user_nick', 'u.user_profile_image'])
-      .addSelect(['state.state_no', 'state.state'])
-      .addSelect(['img.image_no', 'img.image_src', 'img.image_order'])
-      .addSelect(['pc.product_category_no'])
-      .addSelect(['deal.deal_no'])
-      .leftJoin('p.user', 'u')
-      .leftJoin('p.state', 'state')
-      .leftJoin('p.images', 'img', 'img.deleted = :value', { value: 'N' })
-      .leftJoin('p.deals', 'deal', 'deal.deleted = :value', { value: 'N' })
-      .leftJoinAndSelect('deal.addressArea', 'area')
-      .leftJoinAndSelect('area.addressCity', 'city')
-      .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
-        value: 'N',
-      })
-      .leftJoinAndSelect('pc.category', 'category')
-      .loadRelationCountAndMap('p.wish_count', 'p.wishes', 'wish_count', (qb) =>
-        qb.where('wish_count.deleted = :value', { value: 'N' }),
-      )
-      .loadRelationCountAndMap(
-        'p.comment_count',
-        'p.comments',
-        'comment_count',
-        (qb) => qb.where('comment_count.deleted = :value', { value: 'N' }),
-      )
-      .where(`p.product_no = ${product_id}`)
-      .getOne();
+    try {
+      return await getRepository(Product)
+        .createQueryBuilder('p')
+        .select([
+          'p.product_no',
+          'p.product_title',
+          'p.product_content',
+          'p.product_price',
+          'p.product_view',
+          'p.createdAt',
+        ])
+        .addSelect(['u.user_no', 'u.user_nick', 'u.user_profile_image'])
+        .addSelect(['state.state_no', 'state.state'])
+        .addSelect(['img.image_no', 'img.image_src', 'img.image_order'])
+        .addSelect(['pc.product_category_no'])
+        .addSelect(['deal.deal_no'])
+        .leftJoin('p.user', 'u')
+        .leftJoin('p.state', 'state')
+        .leftJoin('p.images', 'img', 'img.deleted = :value', { value: 'N' })
+        .leftJoin('p.deals', 'deal', 'deal.deleted = :value', { value: 'N' })
+        .leftJoinAndSelect('deal.addressArea', 'area')
+        .leftJoinAndSelect('area.addressCity', 'city')
+        .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
+          value: 'N',
+        })
+        .leftJoinAndSelect('pc.category', 'category')
+        .loadRelationCountAndMap(
+          'p.wish_count',
+          'p.wishes',
+          'wish_count',
+          (qb) => qb.where('wish_count.deleted = :value', { value: 'N' }),
+        )
+        .loadRelationCountAndMap(
+          'p.comment_count',
+          'p.comments',
+          'comment_count',
+          (qb) => qb.where('comment_count.deleted = :value', { value: 'N' }),
+        )
+        .where(`p.product_no = ${product_id}`)
+        .getOne();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findAllProductCommentData(
     product_id: Product['product_no'],
   ): Promise<Comment[]> {
-    return await getRepository(Comment)
-      .createQueryBuilder('c')
-      .select(['c.comment_no', 'c.comment_content', 'c.createdAt'])
-      .addSelect(['re.recomment_no', 're.recomment_content', 're.createdAt'])
-      .leftJoin('c.recomments', 're', 're.deleted = :value', { value: 'N' })
-      .where('c.deleted = :value', { value: 'N' })
-      .andWhere(`c.product = ${product_id}`)
-      .getMany();
+    try {
+      return await getRepository(Comment)
+        .createQueryBuilder('c')
+        .select(['c.comment_no', 'c.comment_content', 'c.createdAt'])
+        .addSelect(['re.recomment_no', 're.recomment_content', 're.createdAt'])
+        .leftJoin('c.recomments', 're', 're.deleted = :value', { value: 'N' })
+        .where('c.deleted = :value', { value: 'N' })
+        .andWhere(`c.product = ${product_id}`)
+        .getMany();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findProductWishListData(
