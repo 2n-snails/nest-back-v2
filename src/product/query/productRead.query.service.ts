@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Comment } from 'src/entity/comment.entity';
 import { Product } from 'src/entity/product.entity';
 import { ReComment } from 'src/entity/recomment.entity';
+import { Review } from 'src/entity/review.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
@@ -118,7 +119,9 @@ export class ProductReadService {
     return await this.findProducts(query);
   }
 
-  async findOneProduct(product_id: Product['product_no']): Promise<Product> {
+  async findOneProductData(
+    product_id: Product['product_no'],
+  ): Promise<Product> {
     return await getRepository(Product)
       .createQueryBuilder('p')
       .select([
@@ -157,7 +160,7 @@ export class ProductReadService {
       .getOne();
   }
 
-  async findAllProductComment(
+  async findAllProductCommentData(
     product_id: Product['product_no'],
   ): Promise<Comment[]> {
     return await getRepository(Comment)
@@ -230,6 +233,19 @@ export class ProductReadService {
         .where('rc.recomment_no = :recomment_no', { recomment_no })
         .andWhere('rc.deleted = :value', { value: 'N' })
         .getOne();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async findProductSellerScoreData(user_no: User['user_no']) {
+    try {
+      return await getRepository(Review)
+        .createQueryBuilder('r')
+        .select('AVG(r.review_score)::numeric(10,2)', 'avg')
+        .where(`r.receiver = ${user_no}`)
+        .groupBy('r.receiver')
+        .getRawOne();
     } catch (e) {
       throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }

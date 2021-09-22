@@ -101,13 +101,16 @@ export class ProductService {
 
   // 상품 상세정보 받기
   async findOneProduct(product_id: ProductIdParamDto['product_id']) {
-    const product = await this.productReadService.findOneProduct(product_id);
-    // TODO: 댓글 목록 가져오기
-    const comment = await this.productReadService.findAllProductComment(
+    const product = await this.productReadService.findOneProductData(
       product_id,
     );
-    // TODO: 판매자의 별점 구하기 -> 분리 안함
-    return { product, comment };
+    const comment = await this.productReadService.findAllProductCommentData(
+      product_id,
+    );
+    const review_avg = await this.productReadService.findProductSellerScoreData(
+      product.user.user_no,
+    );
+    return { product, comment, review_avg };
   }
 
   // 상품 거래상태 수정하기
