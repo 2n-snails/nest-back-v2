@@ -17,7 +17,7 @@ export class CreateReviewDto {
   reviewScore: number;
 
   @ApiProperty({
-    description: '리뷰 점수',
+    description: '상품 번호',
     example: 3,
   })
   @IsNumber()
