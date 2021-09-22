@@ -12,6 +12,7 @@ export class UserCreateService {
       .insert()
       .values({
         user_provider_id: `${id}`,
+        user_nick: `${nick}`,
         user_provider: provider,
       })
       .execute();
