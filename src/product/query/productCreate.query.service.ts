@@ -16,69 +16,95 @@ import { CreateReCommentDto } from '../dto/createReComment.dto';
 
 @Injectable()
 export class ProductCreateService {
-  async createProduct(
+  async createProductData(
     product_title: string,
     product_content: string,
     product_price: string,
     user_no: any,
   ) {
-    const product = await getRepository(Product).save({
-      product_title,
-      product_content,
-      product_price,
-      user: user_no,
-    });
-    return product;
-  }
-
-  async createProductImage(data: CreateProductDto['image'], product: Product) {
-    for (let i = 0; i < data.length; i++) {
-      await getRepository(Image).save({
-        image_src: data[i],
-        image_order: i + 1,
-        product,
+    try {
+      const product = await getRepository(Product).save({
+        product_title,
+        product_content,
+        product_price,
+        user: user_no,
       });
+      return product;
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return true;
   }
 
-  async createProductCategory(
+  async createProductImageData(
+    data: CreateProductDto['image'],
+    product: Product,
+  ) {
+    try {
+      for (let i = 0; i < data.length; i++) {
+        await getRepository(Image).save({
+          image_src: data[i],
+          image_order: i + 1,
+          product,
+        });
+      }
+      return true;
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async createProductCategoryData(
     data: CreateProductDto['category'],
     product: Product,
   ) {
-    for (let i = 0; i < data.length; i++) {
-      const category = await getRepository(Category)
-        .createQueryBuilder('c')
-        .select()
-        .where('c.category_parent_name = :parent', { parent: data[i].parent })
-        .andWhere('c.category_child_name = :child', { child: data[i].child })
-        .getOne();
-      await getRepository(ProductCategory).save({
-        category,
-        product,
-      });
+    try {
+      for (let i = 0; i < data.length; i++) {
+        const category = await getRepository(Category)
+          .createQueryBuilder('c')
+          .select()
+          .where('c.category_parent_name = :parent', { parent: data[i].parent })
+          .andWhere('c.category_child_name = :child', { child: data[i].child })
+          .getOne();
+        await getRepository(ProductCategory).save({
+          category,
+          product,
+        });
+      }
+      return true;
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return true;
   }
 
-  async createProductState(product: Product) {
-    await getRepository(State).save({ product, review_state: 'N' });
-    return true;
+  async createProductStateData(product: Product) {
+    try {
+      await getRepository(State).save({ product, review_state: 'N' });
+      return true;
+    } catch (error) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  async createProductDeal(data: CreateProductDto['deal'], product: Product) {
-    for (let i = 0; i < data.length; i++) {
-      const address = await getRepository(AddressArea)
-        .createQueryBuilder('a')
-        .select()
-        .where('a.area_name = :name', { name: data[i] })
-        .getOne();
-      await getRepository(Deal).save({
-        addressArea: address,
-        product,
-      });
+  async createProductDealData(
+    data: CreateProductDto['deal'],
+    product: Product,
+  ) {
+    try {
+      for (let i = 0; i < data.length; i++) {
+        const address = await getRepository(AddressArea)
+          .createQueryBuilder('a')
+          .select()
+          .where('a.area_name = :name', { name: data[i] })
+          .getOne();
+        await getRepository(Deal).save({
+          addressArea: address,
+          product,
+        });
+      }
+      return true;
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return true;
   }
 
   async createWishData(product: any, user: any): Promise<Wish> {

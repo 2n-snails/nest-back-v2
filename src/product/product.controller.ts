@@ -58,7 +58,7 @@ export class ProductController {
   async uploadProduct(@Req() req, @Body() data: CreateProductDto) {
     const user_no = req.user.user_no;
     const result = await this.productService.createProduct(user_no, data);
-    return { success: result };
+    return { success: result, message: '상품 등록 성공' };
   }
 
   // 상품명 검색
