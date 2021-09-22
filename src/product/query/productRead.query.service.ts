@@ -45,6 +45,10 @@ export class ProductReadService {
       .leftJoin('p.deals', 'deal', 'deal.deleted = :value', { value: 'N' })
       .leftJoinAndSelect('deal.addressArea', 'area')
       .leftJoinAndSelect('area.addressCity', 'city')
+      .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
+        value: 'N',
+      })
+      .leftJoinAndSelect('pc.category', 'category')
       .loadRelationCountAndMap('p.wish_count', 'p.wishes', 'wish_count', (qb) =>
         qb.where('wish_count.deleted = :value', { value: 'N' }),
       )
@@ -54,49 +58,58 @@ export class ProductReadService {
         'comment_count',
         (qb) => qb.where('comment_count.deleted = :value', { value: 'N' }),
       )
-      .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
-        value: 'N',
-      })
-      .leftJoinAndSelect('pc.category', 'category')
       .where('p.deleted = :value', { value: 'N' });
-    if (parent || child || title) {
-      if (parent) {
-        products.andWhere(`category.category_parent_name like '%${parent}%'`);
-      } else if (child) {
-        products.andWhere(`category.category_child_name like '%${child}%'`);
-      } else {
-        products.andWhere(`p.product_title like '%${title}%'`);
-      }
+
+    if ('parent' in query) {
+      products.andWhere(`category.category_parent_name like '%${parent}%'`);
     }
+
+    if ('child' in query) {
+      products.andWhere(`category.category_child_name like '%${child}%'`);
+    }
+
+    if ('title' in query) {
+      products.andWhere(`p.product_title like '%${title}%'`);
+    }
+
     const data = await products
       .skip(index)
       .take(limit)
       .orderBy('p.createdAt', 'DESC')
       .getMany();
+
     const next_page = page < total_page ? Number(page) + 1 : null;
     const prev_page = page <= total_page && page > 1 ? Number(page) - 1 : null;
+
     return { data, next_page, prev_page, total_count, total_page };
   }
 
   async productTotalCount(query: any): Promise<number> {
     const { parent, child, title } = query;
-    const count = await getRepository(Product)
+    const count = getRepository(Product)
       .createQueryBuilder('p')
       .where('p.deleted = :value', { value: 'N' });
-    if (parent || child || title) {
+
+    if ('parent' in query || 'child' in query) {
       count
         .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
           value: 'N',
         })
         .leftJoin('pc.category', 'c');
-      if (parent) {
-        count.andWhere(`c.category_parent_name like '%${parent}%'`);
-      } else if (child) {
-        count.andWhere(`c.category_child_name like '%${child}%'`);
-      } else {
-        count.andWhere(`p.product_title like '%${title}%'`);
-      }
     }
+
+    if ('parent' in query) {
+      count.andWhere(`c.category_parent_name like '%${parent}%'`);
+    }
+
+    if ('child' in query) {
+      count.andWhere(`c.category_child_name like '%${child}%'`);
+    }
+
+    if ('title' in query) {
+      count.andWhere(`p.product_title like '%${title}%'`);
+    }
+
     const data = count.getCount();
     return data;
   }
