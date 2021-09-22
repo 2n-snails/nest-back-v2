@@ -11,13 +11,17 @@ import { getRepository } from 'typeorm';
 
 @Injectable()
 export class ProductDeleteService {
-  async deleteProduct(product_no: Product['product_no']) {
-    return await getRepository(Product)
-      .createQueryBuilder()
-      .update()
-      .set({ deleted: 'Y' })
-      .where('product_no = :value', { value: product_no })
-      .execute();
+  async deleteProductData(product_no: Product['product_no']) {
+    try {
+      return await getRepository(Product)
+        .createQueryBuilder()
+        .update()
+        .set({ deleted: 'Y' })
+        .where('product_no = :value', { value: product_no })
+        .execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async deleteProductImageData(product_no: Product['product_no']) {

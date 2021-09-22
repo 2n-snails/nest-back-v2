@@ -77,18 +77,15 @@ export class ProductService {
   }
 
   // 상품 삭제하기
-  async deleteProduct(user: User, product_id: ProductIdParamDto['product_id']) {
-    const product = await this.productReadService.findSellerProductData(
-      product_id,
-    );
-    if (user.user_no !== product.user.user_no) {
-      return false;
-    }
-    await this.productDeleteService.deleteProduct(product_id);
+  async deleteProduct(product_id: ProductIdParamDto['product_id']) {
+    await this.productDeleteService.deleteProductData(product_id);
     await this.productDeleteService.deleteProductImageData(product_id);
     await this.productDeleteService.deleteProductCategoryData(product_id);
     await this.productDeleteService.deleteProductDealData(product_id);
-    await this.productUpdateService.productStateUpdate(product_id, 'delete');
+    await this.productUpdateService.productStateUpdateData(
+      product_id,
+      'delete',
+    );
     // TODO: 채팅방 구현시 채팅방도 삭제?
     return true;
   }
@@ -119,7 +116,7 @@ export class ProductService {
   ) {
     const { state, user_no } = query;
     const user = await this.userService.findUserByUserNo(user_no);
-    const result = await this.productUpdateService.productStateUpdate(
+    const result = await this.productUpdateService.productStateUpdateData(
       product_id,
       state,
       user,

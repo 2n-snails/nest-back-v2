@@ -29,13 +29,17 @@ export class ProductUpdateService {
     }
   }
 
-  async productStateUpdate(
+  async productStateUpdateData(
     product_no: Product['product_no'],
     state: ChangeProductStateDto['state'],
     user?: User,
   ) {
-    const qb = getRepository(State).createQueryBuilder().update();
-    user ? qb.set({ state, user }) : qb.set({ state });
-    return qb.where('product = :value', { value: product_no }).execute();
+    try {
+      const qb = getRepository(State).createQueryBuilder().update();
+      user ? qb.set({ state, user }) : qb.set({ state });
+      return qb.where('product = :value', { value: product_no }).execute();
+    } catch (e) {
+      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
