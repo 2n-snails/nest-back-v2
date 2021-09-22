@@ -32,7 +32,7 @@ export class ProductService {
   ) {}
   // 메인 페이지 상품 데이터 받기
   async getMainPageData(query: MainPageDto) {
-    return await this.productReadService.findProducts(query);
+    return await this.productReadService.findProductsData(query);
   }
 
   // 상품 업로드 하기
