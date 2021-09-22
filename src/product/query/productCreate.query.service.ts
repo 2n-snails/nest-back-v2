@@ -10,7 +10,9 @@ import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
+import { CreateCommentDto } from '../dto/createComment.dto';
 import { CreateProductDto } from '../dto/createProduct.dto';
+import { CreateReCommentDto } from '../dto/createReComment.dto';
 
 @Injectable()
 export class ProductCreateService {
@@ -91,7 +93,7 @@ export class ProductCreateService {
   }
 
   async createCommentData(
-    data: any,
+    data: CreateCommentDto,
     user: any,
     product: any,
   ): Promise<Comment> {
@@ -109,7 +111,7 @@ export class ProductCreateService {
 
   async createReCommentData(
     user: any,
-    data: any,
+    data: CreateReCommentDto,
     comment: any,
   ): Promise<ReComment> {
     try {

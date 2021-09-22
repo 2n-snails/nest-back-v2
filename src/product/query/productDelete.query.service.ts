@@ -5,12 +5,13 @@ import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
 import { ProductCategory } from 'src/entity/product_category.entity';
 import { ReComment } from 'src/entity/recomment.entity';
+import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
 
 @Injectable()
 export class ProductDeleteService {
-  async deleteProduct(product_no: number) {
+  async deleteProduct(product_no: Product['product_no']) {
     return await getRepository(Product)
       .createQueryBuilder()
       .update()
@@ -19,7 +20,7 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductImage(product_no: number) {
+  async deleteProductImage(product_no: Product['product_no']) {
     return await getRepository(Image)
       .createQueryBuilder()
       .update()
@@ -28,7 +29,7 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductCategory(product_no: number) {
+  async deleteProductCategory(product_no: Product['product_no']) {
     return await getRepository(ProductCategory)
       .createQueryBuilder()
       .update()
@@ -37,7 +38,7 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductDeal(product_no: number) {
+  async deleteProductDeal(product_no: Product['product_no']) {
     return await getRepository(Deal)
       .createQueryBuilder()
       .update()
@@ -46,7 +47,10 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteWishData(product_no: number, user_no: number) {
+  async deleteWishData(
+    product_no: Product['product_no'],
+    user_no: User['user_no'],
+  ) {
     try {
       return await getRepository(Wish)
         .createQueryBuilder()
@@ -60,7 +64,7 @@ export class ProductDeleteService {
     }
   }
 
-  async deleteCommentData(comment_no: number) {
+  async deleteCommentData(comment_no: Comment['comment_no']) {
     try {
       return await getRepository(Comment)
         .createQueryBuilder()
@@ -73,7 +77,7 @@ export class ProductDeleteService {
     }
   }
 
-  async deleteReCommentData(recomment_no) {
+  async deleteReCommentData(recomment_no: ReComment['recomment_no']) {
     try {
       return await getRepository(ReComment)
         .createQueryBuilder()

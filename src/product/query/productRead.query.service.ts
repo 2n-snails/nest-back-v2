@@ -3,14 +3,15 @@ import { Comment } from 'src/entity/comment.entity';
 import { Product } from 'src/entity/product.entity';
 import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
+import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
-import { MainPageDto } from '../dto/mainpage.dto';
+import { FindProductsDto } from '../dto/findProducts.dto';
 import { SearchDto } from '../dto/search.dto';
 
 @Injectable()
 export class ProductReadService {
-  async findSellerProduct(product_no: number) {
+  async findSellerProduct(product_no: Product['product_no']) {
     const seller = await getRepository(Product)
       .createQueryBuilder('p')
       .innerJoinAndSelect('p.user', 'u')
@@ -20,7 +21,7 @@ export class ProductReadService {
     return seller;
   }
 
-  async findProducts(query: any) {
+  async findProducts(query: FindProductsDto) {
     const { page, limit, parent, child, title } = query;
     const total_count = await this.productTotalCount(query);
     const total_page = Math.ceil(total_count / limit);
@@ -104,7 +105,7 @@ export class ProductReadService {
     return await this.findProducts(query);
   }
 
-  async findOneProduct(product_id: number): Promise<Product> {
+  async findOneProduct(product_id: Product['product_no']): Promise<Product> {
     return await getRepository(Product)
       .createQueryBuilder('p')
       .select([
@@ -143,7 +144,9 @@ export class ProductReadService {
       .getOne();
   }
 
-  async findAllProductComment(product_id: number): Promise<Comment[]> {
+  async findAllProductComment(
+    product_id: Product['product_no'],
+  ): Promise<Comment[]> {
     return await getRepository(Comment)
       .createQueryBuilder('c')
       .select(['c.comment_no', 'c.comment_content', 'c.createdAt'])
@@ -155,8 +158,8 @@ export class ProductReadService {
   }
 
   async findProductWishListData(
-    product_id: number,
-    user_no: number,
+    product_id: Product['product_no'],
+    user_no: User['user_no'],
   ): Promise<Wish> {
     try {
       return await getRepository(Wish)
@@ -171,7 +174,9 @@ export class ProductReadService {
     }
   }
 
-  async findProductStateData(product_id: number): Promise<State> {
+  async findProductStateData(
+    product_id: Product['product_no'],
+  ): Promise<State> {
     try {
       return await getRepository(State)
         .createQueryBuilder('s')
@@ -183,7 +188,9 @@ export class ProductReadService {
     }
   }
 
-  async findCommentWriterData(comment_no: number): Promise<Comment> {
+  async findCommentWriterData(
+    comment_no: Comment['comment_no'],
+  ): Promise<Comment> {
     try {
       return await getRepository(Comment)
         .createQueryBuilder('c')
@@ -198,7 +205,9 @@ export class ProductReadService {
     }
   }
 
-  async findReCommentData(recomment_no: number): Promise<ReComment> {
+  async findReCommentData(
+    recomment_no: ReComment['recomment_no'],
+  ): Promise<ReComment> {
     try {
       return await getRepository(ReComment)
         .createQueryBuilder('rc')
