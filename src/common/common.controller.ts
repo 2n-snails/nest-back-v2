@@ -1,8 +1,10 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AddressCity } from './../entity/address_city.entity';
 import { CommonService } from './common.service';
 import { Controller, Get } from '@nestjs/common';
 import { Category } from 'src/entity/category.entity';
 
+@ApiTags('common')
 @Controller('common')
 export class CommonController {
   constructor(private readonly commonService: CommonService) {}
