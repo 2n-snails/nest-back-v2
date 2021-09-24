@@ -1,6 +1,7 @@
 import { UserService } from 'src/user/user.service';
 import { Injectable } from '@nestjs/common';
 import { Comment } from 'src/entity/comment.entity';
+import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { Wish } from 'src/entity/wish.entity';
@@ -113,11 +114,6 @@ export class ProductService {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
-  // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
-  async wishProduct(product_id: number, user: number): Promise<Wish> {
-    return await this.productCreateService.createWishData(product_id, user);
-  }
-
   async deletedWish(product_id: number, user: number) {
     return await this.productDeleteService.deleteWishData(product_id, user);
   }
@@ -154,5 +150,25 @@ export class ProductService {
 
   async deleteComment(comment_no: number) {
     return await this.productDeleteService.deleteCommentData(comment_no);
+  }
+
+  async createReComment(
+    user_no: number,
+    data: any,
+    comment_no: number,
+  ): Promise<ReComment> {
+    return await this.productCreateService.createReCommentData(
+      user_no,
+      data,
+      comment_no,
+    );
+  }
+
+  async checkReComment(recomment_no: number): Promise<ReComment> {
+    return await this.productReadService.findReCommentData(recomment_no);
+  }
+
+  async deleteReComment(recomment_no: number) {
+    return await this.productDeleteService.deleteReCommentData(recomment_no);
   }
 }

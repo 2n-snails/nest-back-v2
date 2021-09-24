@@ -123,9 +123,7 @@ export class ProductController {
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    // TODO: createWish 인가 wishProduct 인가? => wishProduct 가 최종인듯?
-    await this.productService.wishProduct(param.product_id, req.user.user_no);
-    // await this.productService.createWish(param.product_id, req.user.user_no);
+    await this.productService.createWish(param.product_id, req.user.user_no);
     return { success: true, message: '상품 찜 추가 성공' };
   }
 
@@ -201,14 +199,47 @@ export class ProductController {
   }
 
   // 상품 대댓글 작성
-  @Post(':product_id/recomment')
-  writeProductRecomment() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Post(':comment_id/recomment')
+  async writeProductRecomment(@Req() req, @Body() data, @Param() param) {
+    const comment_check = await this.productService.checkCommentWriter(
+      param.comment_id,
+    );
+    if (!comment_check) {
+      return {
+        success: false,
+        message: '삭제된 댓글 또는 잘못된 댓글 번호 입니다.',
+      };
+    }
+    await this.productService.createReComment(
+      req.user.user_no,
+      data,
+      param.comment_id,
+    );
+    return { success: true, message: '대댓글 작성 성공' };
   }
 
   // 상품 대댓글 삭제
-  @Delete(':product_id/recomment')
-  deleteProductRecomment() {
-    return;
+  @UseGuards(JwtAccessAuthGuard)
+  @Delete(':recomment_id/recomment')
+  async deleteProductRecomment(@Req() req, @Param() param) {
+    const recomment_check = await this.productService.checkReComment(
+      param.recomment_id,
+    );
+    if (!recomment_check) {
+      return {
+        success: false,
+        message: '삭제된 댓글 또는 잘못된 댓글 번호 입니다.',
+      };
+    }
+    if (recomment_check.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    const result = await this.productService.deleteReComment(
+      param.recomment_id,
+    );
+    return result.affected
+      ? { success: true, message: '대댓글 삭제 성공' }
+      : { success: false, message: '대댓글 삭제 실패' };
   }
 }
