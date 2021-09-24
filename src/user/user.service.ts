@@ -81,11 +81,23 @@ export class UserService {
   }
   async findMyPage(userId: number, state: string) {
     const user = await this.userReadService.findMyInfoData(userId);
-    const queryData = await this.userReadService.findUserProductData(
-      userId,
-      state,
-    );
-    return { user, queryData };
+    let product = {};
+    if (state === 'sale') {
+      product = await this.userReadService.findUserProductData(userId, state);
+    } else if (state === 'sold') {
+      product = await this.userReadService.findUserProductData(userId, state);
+    } else if (state === 'buy') {
+      state = 'sold';
+      // product rebase시 추가 작업
+      // product = await this.userReadService.findUserProductBuyData(
+      //   userId,
+      //   state,
+      // );
+    } else if (state === 'wish') {
+      product = await this.userReadService.findUserWishProductData(userId);
+    }
+
+    return { user, product };
   }
 
   async logoutUser(userId: number) {
