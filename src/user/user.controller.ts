@@ -90,7 +90,6 @@ export class UserController {
   ): any {
     const userId = param.user_id;
     const standard = standardQuery.standard;
-
     return this.userService.findMyPage(userId, standard);
   }
 
