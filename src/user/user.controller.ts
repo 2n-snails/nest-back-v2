@@ -1,3 +1,4 @@
+import { FacebookAuthGuard } from './../auth/guard/facebook.auth.guard';
 import { MyPageStandardDTO } from './dto/myPageStandard.dto';
 import { CreateReviewDto } from './dto/createReview.dto';
 import { UpdateUserNickDto } from './dto/updateUserNick.dto';
@@ -43,14 +44,17 @@ export class UserController {
   }
 
   // 페이스북 로그인 요청
+  @UseGuards(FacebookAuthGuard)
   @Get('auth/facebook')
   facebookLogin() {
     return;
   }
   // 페이스북 로그인 콜백
+  @UseGuards(FacebookAuthGuard)
   @Get('auth/facebook/callback')
-  facebookcallback() {
-    return;
+  facebookcallback(@Req() req, @Res() res: Response) {
+    res.cookie('access_token', req.user);
+    res.redirect(process.env.CLIENT_URL);
   }
 
   // 리프레시 토큰 재발급

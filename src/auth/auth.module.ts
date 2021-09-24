@@ -1,3 +1,4 @@
+import { FaceBookStrategy } from './strategy/facebook.strategy';
 import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -18,7 +19,7 @@ import { KakaoStrategy } from './strategy/kakao.strategy';
     }),
     UserModule,
   ],
-  providers: [AuthService, JwtStrategy, KakaoStrategy],
+  providers: [AuthService, JwtStrategy, KakaoStrategy, FaceBookStrategy],
   exports: [PassportModule, JwtModule],
 })
 export class AuthModule {}
