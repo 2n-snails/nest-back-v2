@@ -155,4 +155,16 @@ export class UserController {
       createReviewDto,
     );
   }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('logout')
+  async logout(@Req() req: any) {
+    const userId = req.user.user_no;
+    const result = await this.userService.logoutUser(userId);
+    if (result.affected) {
+      return { success: true, message: '로그아웃 성공' };
+    }
+    throw new HttpException('server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }
