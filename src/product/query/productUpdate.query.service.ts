@@ -3,10 +3,11 @@ import { Product } from 'src/entity/product.entity';
 import { State } from 'src/entity/state.entity';
 import { User } from 'src/entity/user.entity';
 import { getRepository } from 'typeorm';
+import { UpdateProductDto } from '../dto/updateProduct.dto';
 
 @Injectable()
 export class ProductUpdateService {
-  async productUpdate(data: any, product_no: number) {
+  async productUpdate(data: UpdateProductDto, product_no: number) {
     const { product_title, product_content, product_price } = data;
     return await getRepository(Product)
       .createQueryBuilder()
