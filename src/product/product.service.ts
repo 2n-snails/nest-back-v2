@@ -16,6 +16,7 @@ import { Product } from 'src/entity/product.entity';
 import { SearchDto } from './dto/search.dto';
 import { ChangeProductStateDto } from './dto/chageProductState.dto';
 import { CreateCommentDto } from './dto/createComment.dto';
+import { CreateReCommentDto } from './dto/createReComment.dto';
 
 @Injectable()
 export class ProductService {
@@ -131,7 +132,7 @@ export class ProductService {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
-  async deletedWish(product_id: number, user: number) {
+  async deletedWish(product_id: Product['product_no'], user: User['user_no']) {
     return await this.productDeleteService.deleteWishData(product_id, user);
   }
 
@@ -170,9 +171,9 @@ export class ProductService {
   }
 
   async createReComment(
-    user_no: number,
-    data: any,
-    comment_no: number,
+    user_no: User['user_no'],
+    data: CreateReCommentDto,
+    comment_no: Comment['comment_no'],
   ): Promise<ReComment> {
     return await this.productCreateService.createReCommentData(
       user_no,
@@ -181,11 +182,13 @@ export class ProductService {
     );
   }
 
-  async checkReComment(recomment_no: number): Promise<ReComment> {
+  async checkReComment(
+    recomment_no: ReComment['recomment_no'],
+  ): Promise<ReComment> {
     return await this.productReadService.findReCommentData(recomment_no);
   }
 
-  async deleteReComment(recomment_no: number) {
+  async deleteReComment(recomment_no: ReComment['recomment_no']) {
     return await this.productDeleteService.deleteReCommentData(recomment_no);
   }
 }
