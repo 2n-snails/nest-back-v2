@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AddressArea } from 'src/entity/address_area.entity';
 import { Category } from 'src/entity/category.entity';
 import { Comment } from 'src/entity/comment.entity';
