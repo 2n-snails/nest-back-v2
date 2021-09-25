@@ -82,14 +82,10 @@ export class ProductCreateService {
   }
 
   async createWishData(product: any, user: any): Promise<Wish> {
-    try {
-      return await getRepository(Wish).save({
-        user,
-        product,
-      });
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(Wish).save({
+      user,
+      product,
+    });
   }
 
   async createCommentData(
@@ -97,16 +93,12 @@ export class ProductCreateService {
     user: any,
     product: any,
   ): Promise<Comment> {
-    try {
-      const { comment_content } = data;
-      return await getRepository(Comment).save({
-        comment_content,
-        user,
-        product,
-      });
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const { comment_content } = data;
+    return await getRepository(Comment).save({
+      comment_content,
+      user,
+      product,
+    });
   }
 
   async createReCommentData(
@@ -114,15 +106,11 @@ export class ProductCreateService {
     data: CreateReCommentDto,
     comment: any,
   ): Promise<ReComment> {
-    try {
-      const { recomment_content } = data;
-      return await getRepository(ReComment).save({
-        recomment_content,
-        user,
-        comment,
-      });
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const { recomment_content } = data;
+    return await getRepository(ReComment).save({
+      recomment_content,
+      user,
+      comment,
+    });
   }
 }
