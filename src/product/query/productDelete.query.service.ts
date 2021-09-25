@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Comment } from 'src/entity/comment.entity';
 import { Deal } from 'src/entity/deal.entity';
 import { Image } from 'src/entity/image.entity';
@@ -47,42 +47,30 @@ export class ProductDeleteService {
   }
 
   async deleteWishData(product_no: number, user_no: number) {
-    try {
-      return await getRepository(Wish)
-        .createQueryBuilder()
-        .update()
-        .set({ deleted: 'Y' })
-        .where('product = :product', { product: product_no })
-        .andWhere('user = :user', { user: user_no })
-        .execute();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(Wish)
+      .createQueryBuilder()
+      .update()
+      .set({ deleted: 'Y' })
+      .where('product = :product', { product: product_no })
+      .andWhere('user = :user', { user: user_no })
+      .execute();
   }
 
   async deleteCommentData(comment_no: number) {
-    try {
-      return await getRepository(Comment)
-        .createQueryBuilder()
-        .update()
-        .set({ deleted: 'Y' })
-        .where('comment_no = :comment_no', { comment_no })
-        .execute();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(Comment)
+      .createQueryBuilder()
+      .update()
+      .set({ deleted: 'Y' })
+      .where('comment_no = :comment_no', { comment_no })
+      .execute();
   }
 
-  async deleteReCommentData(recomment_no) {
-    try {
-      return await getRepository(ReComment)
-        .createQueryBuilder()
-        .update()
-        .set({ deleted: 'Y' })
-        .where('recomment_no = :recomment_no', { recomment_no })
-        .execute();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  async deleteReCommentData(recomment_no: number) {
+    return await getRepository(ReComment)
+      .createQueryBuilder()
+      .update()
+      .set({ deleted: 'Y' })
+      .where('recomment_no = :recomment_no', { recomment_no })
+      .execute();
   }
 }
