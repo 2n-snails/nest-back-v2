@@ -23,6 +23,8 @@ import { UpdateProductDto } from './dto/updateProduct.dto';
 import { ChangeProductStateDto } from './dto/chageProductState.dto';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { CommentIdParamDto } from './dto/comment.param.dto';
+import { CreateReCommentDto } from './dto/createReComment.dto';
+import { ReCommentIdParamDto } from './dto/recomment.param.dto';
 
 @Controller('product')
 export class ProductController {
@@ -221,7 +223,11 @@ export class ProductController {
   // 상품 대댓글 작성
   @UseGuards(JwtAccessAuthGuard)
   @Post(':comment_id/recomment')
-  async writeProductRecomment(@Req() req, @Body() data, @Param() param) {
+  async writeProductRecomment(
+    @Req() req,
+    @Body() data: CreateReCommentDto,
+    @Param() param: CommentIdParamDto,
+  ) {
     const comment_check = await this.productService.checkCommentWriter(
       param.comment_id,
     );
@@ -242,7 +248,10 @@ export class ProductController {
   // 상품 대댓글 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':recomment_id/recomment')
-  async deleteProductRecomment(@Req() req, @Param() param) {
+  async deleteProductRecomment(
+    @Req() req,
+    @Param() param: ReCommentIdParamDto,
+  ) {
     const recomment_check = await this.productService.checkReComment(
       param.recomment_id,
     );
