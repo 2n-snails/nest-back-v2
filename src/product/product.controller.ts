@@ -203,6 +203,7 @@ export class ProductController {
     if (!wish_check) {
       return { success: false, message: '찜 목록에 없는 상품입니다.' };
     }
+
     const result = await this.productService.deletedWish(
       param.product_id,
       req.user.user_no,
