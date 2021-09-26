@@ -96,14 +96,18 @@ export class ProductService {
     return await this.productReadService.searchProductsData(query);
   }
 
+  // 상품 상세정보 조회
   async findOneProduct(product_id: Product['product_no']) {
-    const product = await this.productReadService.findOneProduct(product_id);
-    // TODO: 댓글 목록 가져오기
-    const comment = await this.productReadService.findAllProductComment(
+    const product = await this.productReadService.findOneProductData(
       product_id,
     );
-    // TODO: 판매자의 별점 구하기 -> 분리 안함
-    return { product, comment };
+    const comments = await this.productReadService.findAllProductCommentData(
+      product_id,
+    );
+    const review_avg = await this.productReadService.findProductSellerScoreData(
+      product.user.user_no,
+    );
+    return { product, comments, review_avg };
   }
 
   async changeProductState(
