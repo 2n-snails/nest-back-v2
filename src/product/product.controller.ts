@@ -38,8 +38,7 @@ export class ProductController {
   })
   @Get()
   async mainPageData(@Query() query: MainPageDto) {
-    const data = await this.productService.getMainPageData(query);
-    return data;
+    return await this.productService.getMainPageData(query);
   }
 
   // 상품 등록
