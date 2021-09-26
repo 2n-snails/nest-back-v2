@@ -161,26 +161,23 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
   async wishProduct(@Req() req, @Param() param: ProductIdParamDto) {
-    const product_check = await this.productService.checkProductState(
+    const product = await this.productService.checkProductState(
       param.product_id,
     );
-    if (!product_check) {
+    if (!product) {
       return {
         success: false,
         message: `${param.product_id}번 상품이 존재하지 않습니다.`,
       };
     }
-    if (
-      product_check.state !== 'sale' &&
-      product_check.state !== 'reservation'
-    ) {
+    if (product.state === 'delete' || product.state !== 'sold') {
       return {
         success: false,
         message: '삭제, 판매 완료된 상품은 찜목록에 추가할 수 없습니다.',
       };
     }
 
-    const wish_check = await this.productService.checkProductWishList(
+    const wish_check = await this.productService.checkWishList(
       param.product_id,
       req.user.user_no,
     );
@@ -199,7 +196,7 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
   async deleteProductWish(@Req() req, @Param() param: ProductIdParamDto) {
-    const wish_check = await this.productService.checkProductWishList(
+    const wish_check = await this.productService.checkWishList(
       param.product_id,
       req.user.user_no,
     );

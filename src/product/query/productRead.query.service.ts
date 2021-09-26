@@ -170,10 +170,7 @@ export class ProductReadService {
       .getMany();
   }
 
-  async findProductWishListData(
-    product_id: number,
-    user_no: number,
-  ): Promise<Wish> {
+  async findWishListData(product_id: number, user_no: number): Promise<Wish> {
     return await getRepository(Wish)
       .createQueryBuilder('w')
       .select()
