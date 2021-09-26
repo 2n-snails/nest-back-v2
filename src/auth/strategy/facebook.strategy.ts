@@ -22,8 +22,6 @@ export class FaceBookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: any,
     done: any,
   ): Promise<any> {
-    console.log(profile);
-
     const user = await this.authService.validateUser(profile.id);
     if (!user) {
       const userFirstnick = `usernick${Math.floor(Math.random() * 1000000)}`;
