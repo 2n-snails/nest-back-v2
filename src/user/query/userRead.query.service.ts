@@ -157,4 +157,51 @@ export class UserReadService {
       .getMany();
     return result;
   }
+
+  async findUserBuyProduct(user_id: number, state: string): Promise<User[]> {
+    const result = await getRepository(User)
+      .createQueryBuilder('buyer')
+      .leftJoinAndSelect('buyer.state', 'state')
+      .leftJoinAndSelect('state.product', 'p')
+      .leftJoinAndSelect('p.images', 'image')
+      .leftJoinAndSelect('p.comments', 'comment')
+      .leftJoinAndSelect('p.deals', 'deal')
+      .leftJoinAndSelect('deal.addressArea', 'addressArea')
+      .leftJoinAndSelect('addressArea.addressCity', 'addressCity')
+      .leftJoinAndSelect('p.user', 'seller')
+      .select([
+        'buyer.user_no',
+        'state.state_no',
+        'p.product_no',
+        'p.product_title',
+        'p.product_content',
+        'p.product_view',
+        'p.createdAt',
+        'image.image_src',
+        'image.image_order',
+        'deal.deal_no',
+        'addressArea.area_name',
+        'addressCity.city_name',
+        'seller.user_no',
+        'seller.user_profile_image',
+        'seller.user_nick',
+      ])
+      .loadRelationCountAndMap(
+        'p.commentCount',
+        'p.comments',
+        'commentCount',
+        (qb) => qb.where(`commentCount.deleted = 'N'`),
+      )
+      .loadRelationCountAndMap(
+        'p.productWishCount',
+        'p.wishes',
+        'productWish',
+        (qb) => qb.where(`productWish.deleted = 'N'`),
+      )
+      .where(`buyer.user_no = ${user_id}`)
+      .andWhere(`p.deleted = 'N'`)
+      .andWhere('state.state = :state', { state })
+      .getMany();
+    return result;
+  }
 }

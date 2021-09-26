@@ -81,7 +81,7 @@ export class UserController {
   // ?standard={sale, sold, buy, wish}
   @ApiOperation({
     summary: `유저의 상점`,
-    description: `유저 상점의 판매물품, 판매완료, 구매내역, 찜한상품 요청 라우터 (수정 예정)`,
+    description: `유저 상점의 판매물품, 판매완료, 구매내역, 찜한상품 요청 라우터`,
   })
   @Get('mypage/:user_id')
   myPage(
