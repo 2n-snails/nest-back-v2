@@ -63,8 +63,7 @@ export class ProductController {
   })
   @Get('search')
   async searchProduct(@Query() query: SearchDto) {
-    const data = await this.productService.searchProduct(query);
-    return data;
+    return await this.productService.searchProduct(query);
   }
 
   // 상품 상세 페이지
