@@ -7,7 +7,7 @@ import { UpdateProductDto } from '../dto/updateProduct.dto';
 
 @Injectable()
 export class ProductUpdateService {
-  async productUpdate(data: UpdateProductDto, product_no: number) {
+  async productUpdateData(data: UpdateProductDto, product_no: number) {
     const { product_title, product_content, product_price } = data;
     return await getRepository(Product)
       .createQueryBuilder()
@@ -21,7 +21,7 @@ export class ProductUpdateService {
       .execute();
   }
 
-  async productStateUpdate(product_no: number, state: string, user?: User) {
+  async productStateUpdateData(product_no: number, state: string, user?: User) {
     const qb = getRepository(State).createQueryBuilder().update();
     user ? qb.set({ state, user }) : qb.set({ state });
     return qb.where('product = :value', { value: product_no }).execute();

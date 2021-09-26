@@ -10,7 +10,7 @@ import { getRepository } from 'typeorm';
 
 @Injectable()
 export class ProductDeleteService {
-  async deleteProduct(product_no: number) {
+  async deleteProductData(product_no: number) {
     return await getRepository(Product)
       .createQueryBuilder()
       .update()
@@ -19,7 +19,7 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductImage(product_no: number) {
+  async deleteProductImageData(product_no: number) {
     return await getRepository(Image)
       .createQueryBuilder()
       .update()
@@ -28,7 +28,7 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductCategory(product_no: number) {
+  async deleteProductCategoryData(product_no: number) {
     return await getRepository(ProductCategory)
       .createQueryBuilder()
       .update()
@@ -37,7 +37,7 @@ export class ProductDeleteService {
       .execute();
   }
 
-  async deleteProductDeal(product_no: number) {
+  async deleteProductDealData(product_no: number) {
     return await getRepository(Deal)
       .createQueryBuilder()
       .update()

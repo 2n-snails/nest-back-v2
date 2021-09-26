@@ -52,21 +52,17 @@ export class ProductService {
   }
 
   async modifyProduct(
-    user: User,
+    product: Product,
     data: UpdateProductDto,
     product_id: Product['product_no'],
   ) {
-    // TODO: 밑에 3줄 삭제 예정
-    const product = await this.productReadService.findSellerProduct(product_id);
-    if (user.user_no !== product.user.user_no) {
-      return false;
-    }
     // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
-    await this.productDeleteService.deleteProductImage(product_id);
-    await this.productDeleteService.deleteProductCategory(product_id);
-    await this.productDeleteService.deleteProductDeal(product_id);
+    await this.productDeleteService.deleteProductImageData(product_id);
+    await this.productDeleteService.deleteProductCategoryData(product_id);
+    await this.productDeleteService.deleteProductDealData(product_id);
+
     // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
-    await this.productUpdateService.productUpdate(data, product_id);
+    await this.productUpdateService.productUpdateData(data, product_id);
     await this.productCreateService.createProductImageData(data.image, product);
     await this.productCreateService.createProductCategoryData(
       data.category,
@@ -76,17 +72,15 @@ export class ProductService {
     return true;
   }
 
-  async deleteProduct(user: User, product_id: Product['product_no']) {
-    // TODO: 밑에 3줄 삭제 예정
-    const product = await this.productReadService.findSellerProduct(product_id);
-    if (user.user_no !== product.user.user_no) {
-      return false;
-    }
-    await this.productDeleteService.deleteProduct(product_id);
-    await this.productDeleteService.deleteProductImage(product_id);
-    await this.productDeleteService.deleteProductCategory(product_id);
-    await this.productDeleteService.deleteProductDeal(product_id);
-    await this.productUpdateService.productStateUpdate(product_id, 'delete');
+  async deleteProduct(product_id: Product['product_no']) {
+    await this.productDeleteService.deleteProductData(product_id);
+    await this.productDeleteService.deleteProductImageData(product_id);
+    await this.productDeleteService.deleteProductCategoryData(product_id);
+    await this.productDeleteService.deleteProductDealData(product_id);
+    await this.productUpdateService.productStateUpdateData(
+      product_id,
+      'delete',
+    );
     // TODO: 채팅방 구현시 채팅방도 삭제?
     return true;
   }
@@ -116,7 +110,7 @@ export class ProductService {
   ) {
     const { state, user_no } = query;
     const user = await this.userService.findUserByUserNo(user_no);
-    const result = await this.productUpdateService.productStateUpdate(
+    const result = await this.productUpdateService.productStateUpdateData(
       product_id,
       state,
       user,
@@ -126,8 +120,10 @@ export class ProductService {
       : { success: false, message: '상품 상태 수정 실패' };
   }
 
-  async findProductSeller(product_id: Product['product_no']) {
-    return await this.productReadService.findSellerProduct(product_id);
+  async findProductAndSeller(product_id: Product['product_no']) {
+    return await this.productReadService.findProductInfoAndSellerData(
+      product_id,
+    );
   }
 
   async createWish(
