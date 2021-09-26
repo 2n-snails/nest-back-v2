@@ -141,14 +141,11 @@ export class ProductService {
     return await this.productReadService.findProductStateData(product_id);
   }
 
-  async checkProductWishList(
+  async checkWishList(
     product_id: Product['product_no'],
     user_no: User['user_no'],
   ): Promise<Wish> {
-    return await this.productReadService.findProductWishListData(
-      product_id,
-      user_no,
-    );
+    return await this.productReadService.findWishListData(product_id, user_no);
   }
 
   async createComment(
