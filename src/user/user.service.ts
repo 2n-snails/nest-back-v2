@@ -88,11 +88,7 @@ export class UserService {
       product = await this.userReadService.findUserProductData(userId, state);
     } else if (state === 'buy') {
       state = 'sold';
-      // product rebase시 추가 작업
-      // product = await this.userReadService.findUserProductBuyData(
-      //   userId,
-      //   state,
-      // );
+      product = await this.userReadService.findUserBuyProduct(userId, state);
     } else if (state === 'wish') {
       product = await this.userReadService.findUserWishProductData(userId);
     }
