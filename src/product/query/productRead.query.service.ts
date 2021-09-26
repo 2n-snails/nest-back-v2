@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Comment } from 'src/entity/comment.entity';
 import { Product } from 'src/entity/product.entity';
 import { ReComment } from 'src/entity/recomment.entity';
+import { Review } from 'src/entity/review.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
@@ -119,7 +120,7 @@ export class ProductReadService {
     return await this.findProductsData(query);
   }
 
-  async findOneProduct(product_id: number): Promise<Product> {
+  async findOneProductData(product_id: number): Promise<Product> {
     return await getRepository(Product)
       .createQueryBuilder('p')
       .select([
@@ -158,7 +159,7 @@ export class ProductReadService {
       .getOne();
   }
 
-  async findAllProductComment(product_id: number): Promise<Comment[]> {
+  async findAllProductCommentData(product_id: number): Promise<Comment[]> {
     return await getRepository(Comment)
       .createQueryBuilder('c')
       .select(['c.comment_no', 'c.comment_content', 'c.createdAt'])
@@ -210,5 +211,14 @@ export class ProductReadService {
       .where('rc.recomment_no = :recomment_no', { recomment_no })
       .andWhere('rc.deleted = :value', { value: 'N' })
       .getOne();
+  }
+
+  async findProductSellerScoreData(user_no: number) {
+    return await getRepository(Review)
+      .createQueryBuilder('r')
+      .select('AVG(r.review_score)::numeric(10,2)', 'avg')
+      .where(`r.receiver = ${user_no}`)
+      .groupBy('r.receiver')
+      .getRawOne();
   }
 }
