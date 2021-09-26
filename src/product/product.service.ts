@@ -27,9 +27,9 @@ export class ProductService {
     private readonly productDeleteService: ProductDeleteService,
     private readonly userService: UserService,
   ) {}
+  // 메인페이지 데이터 조회
   async getMainPageData(query: MainPageDto) {
-    const data = await this.productReadService.findProducts(query);
-    return data;
+    return await this.productReadService.findProductsData(query);
   }
 
   async createProduct(user_no: User['user_no'], data: CreateProductDto) {
@@ -91,8 +91,9 @@ export class ProductService {
     return true;
   }
 
+  // 상품명 검색
   async searchProduct(query: SearchDto) {
-    return await this.productReadService.search(query);
+    return await this.productReadService.searchProductsData(query);
   }
 
   async findOneProduct(product_id: Product['product_no']) {

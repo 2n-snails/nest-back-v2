@@ -20,11 +20,13 @@ export class ProductReadService {
     return seller;
   }
 
-  async findProducts(query: FindProductsDto) {
+  async findProductsData(query: FindProductsDto) {
     const { page, limit, parent, child, title } = query;
-    const total_count = await this.productTotalCount(query);
+
+    const total_count = await this.productTotalCountData(query);
     const total_page = Math.ceil(total_count / limit);
     const index = (page - 1) * limit;
+
     const products = getRepository(Product)
       .createQueryBuilder('p')
       .select([
@@ -58,50 +60,63 @@ export class ProductReadService {
       })
       .leftJoinAndSelect('pc.category', 'category')
       .where('p.deleted = :value', { value: 'N' });
-    if (parent || child || title) {
-      if (parent) {
-        products.andWhere(`category.category_parent_name like '%${parent}%'`);
-      } else if (child) {
-        products.andWhere(`category.category_child_name like '%${child}%'`);
-      } else {
-        products.andWhere(`p.product_title like '%${title}%'`);
-      }
+
+    if ('parent' in query) {
+      products.andWhere(`category.category_parent_name like '%${parent}%'`);
     }
+
+    if ('child' in query) {
+      products.andWhere(`category.category_child_name like '%${child}%'`);
+    }
+
+    if ('title' in query) {
+      products.andWhere(`p.product_title like '%${title}%'`);
+    }
+
     const data = await products
       .skip(index)
       .take(limit)
       .orderBy('p.createdAt', 'DESC')
       .getMany();
+
     const next_page = page < total_page ? Number(page) + 1 : null;
     const prev_page = page <= total_page && page > 1 ? Number(page) - 1 : null;
+
     return { data, next_page, prev_page, total_count, total_page };
   }
 
-  async productTotalCount(query: FindProductsDto): Promise<number> {
+  async productTotalCountData(query: FindProductsDto): Promise<number> {
     const { parent, child, title } = query;
+
     const count = await getRepository(Product)
       .createQueryBuilder('p')
       .where('p.deleted = :value', { value: 'N' });
-    if (parent || child || title) {
+
+    if ('parent' in query || 'child' in query) {
       count
         .leftJoin('p.productCategories', 'pc', 'pc.deleted = :value', {
           value: 'N',
         })
         .leftJoin('pc.category', 'c');
-      if (parent) {
-        count.andWhere(`c.category_parent_name like '%${parent}%'`);
-      } else if (child) {
-        count.andWhere(`c.category_child_name like '%${child}%'`);
-      } else {
-        count.andWhere(`p.product_title like '%${title}%'`);
-      }
+    }
+
+    if ('parent' in query) {
+      count.andWhere(`c.category_parent_name like '%${parent}%'`);
+    }
+
+    if ('child' in query) {
+      count.andWhere(`c.category_child_name like '%${child}%'`);
+    }
+
+    if ('title' in query) {
+      count.andWhere(`p.product_title like '%${title}%'`);
     }
     const data = count.getCount();
     return data;
   }
 
-  async search(query: SearchDto) {
-    return await this.findProducts(query);
+  async searchProductsData(query: SearchDto) {
+    return await this.findProductsData(query);
   }
 
   async findOneProduct(product_id: number): Promise<Product> {
