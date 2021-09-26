@@ -34,20 +34,20 @@ export class ProductService {
 
   async createProduct(user_no: User['user_no'], data: CreateProductDto) {
     const { product_title, product_content, product_price } = data;
-    const product = await this.productCreateService.createProduct(
+    const product = await this.productCreateService.createProductData(
       product_title,
       product_content,
       product_price,
       user_no,
     );
 
-    await this.productCreateService.createProductImage(data.image, product);
-    await this.productCreateService.createProductCategory(
+    await this.productCreateService.createProductImageData(data.image, product);
+    await this.productCreateService.createProductCategoryData(
       data.category,
       product,
     );
-    await this.productCreateService.createProductDeal(data.deal, product);
-    await this.productCreateService.createProductState(product);
+    await this.productCreateService.createProductDealData(data.deal, product);
+    await this.productCreateService.createProductStateData(product);
     return true;
   }
 
@@ -67,12 +67,12 @@ export class ProductService {
     await this.productDeleteService.deleteProductDeal(product_id);
     // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
     await this.productUpdateService.productUpdate(data, product_id);
-    await this.productCreateService.createProductImage(data.image, product);
-    await this.productCreateService.createProductCategory(
+    await this.productCreateService.createProductImageData(data.image, product);
+    await this.productCreateService.createProductCategoryData(
       data.category,
       product,
     );
-    await this.productCreateService.createProductDeal(data.deal, product);
+    await this.productCreateService.createProductDealData(data.deal, product);
     return true;
   }
 

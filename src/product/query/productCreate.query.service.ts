@@ -16,7 +16,7 @@ import { CreateReCommentDto } from '../dto/createReComment.dto';
 
 @Injectable()
 export class ProductCreateService {
-  async createProduct(
+  async createProductData(
     product_title: string,
     product_content: string,
     product_price: string,
@@ -31,7 +31,10 @@ export class ProductCreateService {
     return product;
   }
 
-  async createProductImage(data: CreateProductDto['image'], product: Product) {
+  async createProductImageData(
+    data: CreateProductDto['image'],
+    product: Product,
+  ) {
     for (let i = 0; i < data.length; i++) {
       await getRepository(Image).save({
         image_src: data[i],
@@ -42,7 +45,7 @@ export class ProductCreateService {
     return true;
   }
 
-  async createProductCategory(
+  async createProductCategoryData(
     data: CreateProductDto['category'],
     product: Product,
   ) {
@@ -61,12 +64,15 @@ export class ProductCreateService {
     return true;
   }
 
-  async createProductState(product: Product) {
+  async createProductStateData(product: Product) {
     await getRepository(State).save({ product, review_state: 'N' });
     return true;
   }
 
-  async createProductDeal(data: CreateProductDto['deal'], product: Product) {
+  async createProductDealData(
+    data: CreateProductDto['deal'],
+    product: Product,
+  ) {
     for (let i = 0; i < data.length; i++) {
       const address = await getRepository(AddressArea)
         .createQueryBuilder('a')
