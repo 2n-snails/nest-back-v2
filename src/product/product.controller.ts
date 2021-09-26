@@ -88,13 +88,22 @@ export class ProductController {
     @Body() data: UpdateProductDto,
     @Param() param: ProductIdParamDto,
   ) {
-    // TODO: modifyProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
+    const product = await this.productService.findProductAndSeller(
+      param.product_id,
+    );
+
+    if (product.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+
     const result = await this.productService.modifyProduct(
-      req.user,
+      product,
       data,
       param.product_id,
     );
-    return result ? { success: true } : { success: false };
+    return result
+      ? { success: true, message: '상품 수정 성공' }
+      : { success: false, message: '상품 수정 실패' };
   }
 
   // 상품 삭제
@@ -105,12 +114,18 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
   async deleteProduct(@Req() req, @Param() param: ProductIdParamDto) {
-    // TODO: deleteProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
-    const result = await this.productService.deleteProduct(
-      req.user,
+    const product = await this.productService.findProductAndSeller(
       param.product_id,
     );
-    return result ? { success: true } : { success: false };
+
+    if (product.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+
+    const result = await this.productService.deleteProduct(param.product_id);
+    return result
+      ? { success: true, message: '상품 삭제 성공' }
+      : { success: false, message: '상품 삭제 실패' };
   }
 
   // 상품 상태 수정
@@ -126,7 +141,7 @@ export class ProductController {
     @Param() param: ProductIdParamDto,
     @Query() query: ChangeProductStateDto,
   ) {
-    const seller = await this.productService.findProductSeller(
+    const seller = await this.productService.findProductAndSeller(
       param.product_id,
     );
     if (seller.user.user_no !== req.user.user_no) {

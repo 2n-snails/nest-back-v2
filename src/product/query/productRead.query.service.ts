@@ -11,7 +11,7 @@ import { SearchDto } from '../dto/search.dto';
 
 @Injectable()
 export class ProductReadService {
-  async findSellerProduct(product_no: number) {
+  async findProductInfoAndSellerData(product_no: number) {
     const seller = await getRepository(Product)
       .createQueryBuilder('p')
       .innerJoinAndSelect('p.user', 'u')
