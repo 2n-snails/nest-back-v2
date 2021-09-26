@@ -25,12 +25,17 @@ import { CreateCommentDto } from './dto/createComment.dto';
 import { CommentIdParamDto } from './dto/comment.param.dto';
 import { CreateReCommentDto } from './dto/createReComment.dto';
 import { ReCommentIdParamDto } from './dto/recomment.param.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('product')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   // 메인페이지 데이터
+  @ApiOperation({
+    summary: '메인페이지 상품 데이터 요청',
+  })
   @Get()
   async mainPageData(@Query() query: MainPageDto) {
     const data = await this.productService.getMainPageData(query);
@@ -38,6 +43,10 @@ export class ProductController {
   }
 
   // 상품 등록
+  @ApiOperation({
+    summary: '상품 업로드',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Post()
   async uploadProduct(@Req() req, @Body() data: CreateProductDto) {
@@ -48,6 +57,9 @@ export class ProductController {
 
   // 상품명 검색
   // ?prodcut-name={data}
+  @ApiOperation({
+    summary: '상품 검색',
+  })
   @Get('search')
   async searchProduct(@Query() query: SearchDto) {
     const data = await this.productService.searchProduct(query);
@@ -55,6 +67,9 @@ export class ProductController {
   }
 
   // 상품 상세 페이지
+  @ApiOperation({
+    summary: '상품 상세페이지 정보 요청',
+  })
   @Get(':product_id')
   async productDetail(@Param() param: ProductIdParamDto) {
     const data = await this.productService.findOneProduct(param.product_id);
@@ -62,6 +77,10 @@ export class ProductController {
   }
 
   // 상품 수정
+  @ApiOperation({
+    summary: '상품 정보 수정하기',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Put(':product_id')
   async modifyProduct(
@@ -79,6 +98,10 @@ export class ProductController {
   }
 
   // 상품 삭제
+  @ApiOperation({
+    summary: '상품 삭제하기',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
   async deleteProduct(@Req() req, @Param() param: ProductIdParamDto) {
@@ -92,6 +115,10 @@ export class ProductController {
 
   // 상품 상태 수정
   // state={ reservation, sold }, user_no
+  @ApiOperation({
+    summary: '상품 거래상태 수정',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Patch(':product_id')
   async changeProductState(
@@ -112,6 +139,10 @@ export class ProductController {
   }
 
   // 상품 찜하기
+  @ApiOperation({
+    summary: '상품 찜 목록 추가',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
   async wishProduct(@Req() req, @Param() param: ProductIdParamDto) {
@@ -146,6 +177,10 @@ export class ProductController {
   }
 
   // 상품 찜 취소
+  @ApiOperation({
+    summary: '찜 취소',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
   async deleteProductWish(@Req() req, @Param() param: ProductIdParamDto) {
@@ -166,6 +201,10 @@ export class ProductController {
   }
 
   // 상품 댓글 작성
+  @ApiOperation({
+    summary: '댓글 작성',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/comment')
   async writeProductComment(
@@ -198,6 +237,10 @@ export class ProductController {
   }
 
   // 상품 댓글 삭제
+  @ApiOperation({
+    summary: '댓글 삭제',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':comment_id/comment')
   async deleteProductComment(@Req() req, @Param() param: CommentIdParamDto) {
@@ -221,6 +264,10 @@ export class ProductController {
   }
 
   // 상품 대댓글 작성
+  @ApiOperation({
+    summary: '대댓글 작성',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Post(':comment_id/recomment')
   async writeProductRecomment(
@@ -246,6 +293,10 @@ export class ProductController {
   }
 
   // 상품 대댓글 삭제
+  @ApiOperation({
+    summary: '대댓글 삭제',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':recomment_id/recomment')
   async deleteProductRecomment(
