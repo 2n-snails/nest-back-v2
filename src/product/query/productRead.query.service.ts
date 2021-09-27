@@ -6,7 +6,6 @@ import { Review } from 'src/entity/review.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
-import { FindProductsDto } from '../dto/findProducts.dto';
 import { SearchDto } from '../dto/search.dto';
 
 @Injectable()
@@ -21,7 +20,7 @@ export class ProductReadService {
     return seller;
   }
 
-  async findProductsData(query: FindProductsDto) {
+  async findProductsData(query: any) {
     const { page, limit, parent, child, title } = query;
 
     const total_count = await this.productTotalCountData(query);
@@ -86,7 +85,7 @@ export class ProductReadService {
     return { data, next_page, prev_page, total_count, total_page };
   }
 
-  async productTotalCountData(query: FindProductsDto): Promise<number> {
+  async productTotalCountData(query: any): Promise<number> {
     const { parent, child, title } = query;
 
     const count = await getRepository(Product)
