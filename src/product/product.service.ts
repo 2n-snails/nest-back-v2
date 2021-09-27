@@ -177,7 +177,7 @@ export class ProductService {
     );
   }
 
-  async checkReComment(
+  async checkReCommentWriter(
     recomment_no: ReComment['recomment_no'],
   ): Promise<ReComment> {
     return await this.productReadService.findReCommentData(recomment_no);
