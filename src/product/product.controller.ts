@@ -319,7 +319,7 @@ export class ProductController {
     @Req() req,
     @Param() param: ReCommentIdParamDto,
   ) {
-    const recomment_check = await this.productService.checkReComment(
+    const recomment_check = await this.productService.checkReCommentWriter(
       param.recomment_id,
     );
     if (!recomment_check) {
