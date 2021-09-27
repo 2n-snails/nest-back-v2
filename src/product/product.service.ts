@@ -152,12 +152,9 @@ export class ProductService {
     data: CreateCommentDto,
     user: User['user_no'],
     product_id: Product['product_no'],
-  ): Promise<Comment> {
-    return await this.productCreateService.createCommentData(
-      data,
-      user,
-      product_id,
-    );
+  ) {
+    await this.productCreateService.createCommentData(data, user, product_id);
+    return true;
   }
 
   async checkCommentWriter(comment_no: Comment['comment_no']) {
