@@ -268,10 +268,11 @@ export class ProductController {
         message: '이미 삭제된 댓글이거나 존재하지 않는 댓글입니다.',
       };
     }
-    console.log(comment_check);
+
     if (comment_check.user.user_no !== req.user.user_no) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
+
     const result = await this.productService.deleteComment(param.comment_id);
     return result.affected
       ? { success: true, message: '댓글 삭제 성공' }
