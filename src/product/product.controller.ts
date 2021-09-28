@@ -96,8 +96,14 @@ export class ProductController {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
-    await this.productService.modifyProduct(product, data, param.product_id);
-    return { success: true, message: '상품 수정 성공' };
+    const result = await this.productService.modifyProduct(
+      product,
+      data,
+      param.product_id,
+    );
+    return result
+      ? { success: true, message: '상품 수정 성공' }
+      : { success: false, message: '상품 수정 실패' };
   }
 
   // 상품 삭제

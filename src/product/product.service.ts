@@ -57,19 +57,46 @@ export class ProductService {
     product_id: Product['product_no'],
   ) {
     // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
-    await this.productDeleteService.deleteProductImageData(product_id);
-    await this.productDeleteService.deleteProductCategoryData(product_id);
-    await this.productDeleteService.deleteProductDealData(product_id);
+    const delete_image = await this.productDeleteService.deleteProductImageData(
+      product_id,
+    );
+    const delete_category =
+      await this.productDeleteService.deleteProductCategoryData(product_id);
+    const delete_deal = await this.productDeleteService.deleteProductDealData(
+      product_id,
+    );
 
     // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
-    await this.productUpdateService.productUpdateData(data, product_id);
-    await this.productCreateService.createProductImageData(data.image, product);
-    await this.productCreateService.createProductCategoryData(
-      data.category,
+    const update_product = await this.productUpdateService.productUpdateData(
+      data,
+      product_id,
+    );
+    const update_image = await this.productCreateService.createProductImageData(
+      data.image,
       product,
     );
-    await this.productCreateService.createProductDealData(data.deal, product);
-    return true;
+    const update_category =
+      await this.productCreateService.createProductCategoryData(
+        data.category,
+        product,
+      );
+    const update_deal = await this.productCreateService.createProductDealData(
+      data.deal,
+      product,
+    );
+    if (
+      delete_image.affected &&
+      delete_category.affected &&
+      delete_category.affected &&
+      update_product.affected &&
+      update_image &&
+      update_category &&
+      update_deal
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async deleteProduct(product_id: Product['product_no']) {
