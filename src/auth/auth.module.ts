@@ -20,6 +20,6 @@ import { KakaoStrategy } from './strategy/kakao.strategy';
     UserModule,
   ],
   providers: [AuthService, JwtStrategy, KakaoStrategy, FaceBookStrategy],
-  exports: [PassportModule, JwtModule],
+  exports: [PassportModule, JwtModule, AuthService],
 })
 export class AuthModule {}

@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../auth.service';
 import { UserService } from 'src/user/user.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtAccessAuthGuard extends AuthGuard('jwt') {
@@ -29,8 +29,15 @@ export class JwtAccessAuthGuard extends AuthGuard('jwt') {
 
     const token = authorization.replace('Bearer ', '');
     const tokenValidate = await this.validate(token);
-    request.user = tokenValidate;
-    response.cookie('access_token', tokenValidate);
+
+    if (tokenValidate.change) {
+      // 새로운 토큰 쿠키에 전송
+      response.cookie('access_token', tokenValidate.new_token);
+    } else {
+      // 기존 토큰 그대로 쿠키에 전송
+      response.cookie('access_token', token);
+    }
+    request.user = tokenValidate.user;
     return true;
   }
 
@@ -51,15 +58,28 @@ export class JwtAccessAuthGuard extends AuthGuard('jwt') {
         const user = await this.userService.findUserByUserNo(
           token_verify.user_no,
         );
-        // TODO: find Refresh Token and new Access Token Generate
-        const new_access_token = await this.authService.createAccessToken(user);
-        return new_access_token;
+        // 엑세스 토큰 만료시간이 5분 미만 일때 리프레쉬 토큰 검증 후 새로운 토큰 발급
+        const refresh_token_verify = await this.jwtService.verify(
+          user.user_refresh_token,
+          {
+            secret: process.env.JWT_SECRET,
+          },
+        );
+        // 리프레쉬 토큰 정보로 유저 조회
+        const ex_user = await this.userService.findUserByUserNo(
+          refresh_token_verify.user_no,
+        );
+
+        const new_token = await this.authService.createAccessToken(ex_user);
+        return { user, new_token, change: true };
       }
       const user = await this.userService.findUserByUserNo(
         token_verify.user_no,
       );
-      return user;
+      return { user, change: false };
     } catch (error) {
+      console.log(error);
+
       switch (error.message) {
         case 'invalid token':
           throw new HttpException('유효하지 않은 토큰입니다.', 401);
