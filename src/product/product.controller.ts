@@ -96,14 +96,8 @@ export class ProductController {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
-    const result = await this.productService.modifyProduct(
-      product,
-      data,
-      param.product_id,
-    );
-    return result
-      ? { success: true, message: '상품 수정 성공' }
-      : { success: false, message: '상품 수정 실패' };
+    await this.productService.modifyProduct(product, data, param.product_id);
+    return { success: true, message: '상품 수정 성공' };
   }
 
   // 상품 삭제
@@ -122,10 +116,8 @@ export class ProductController {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
-    const result = await this.productService.deleteProduct(param.product_id);
-    return result
-      ? { success: true, message: '상품 삭제 성공' }
-      : { success: false, message: '상품 삭제 실패' };
+    await this.productService.deleteProduct(param.product_id);
+    return { success: true, message: '상품 삭제 성공' };
   }
 
   // 상품 상태 수정
@@ -241,14 +233,12 @@ export class ProductController {
       };
     }
 
-    const result = await this.productService.createComment(
+    await this.productService.createComment(
       data,
       req.user.user_no,
       param.product_id,
     );
-    return result
-      ? { success: true, message: '댓글 작성 성공' }
-      : { success: false, message: '댓글 작성 실패' };
+    return { success: true, message: '댓글 작성 성공' };
   }
 
   // 상품 댓글 삭제
