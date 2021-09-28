@@ -153,10 +153,7 @@ export class ProductService {
     );
   }
 
-  async createWish(
-    product_id: Product['product_no'],
-    user: User['user_no'],
-  ): Promise<Wish> {
+  async createWish(product_id: Product['product_no'], user: User['user_no']) {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
@@ -180,8 +177,11 @@ export class ProductService {
     user: User['user_no'],
     product_id: Product['product_no'],
   ) {
-    await this.productCreateService.createCommentData(data, user, product_id);
-    return true;
+    return await this.productCreateService.createCommentData(
+      data,
+      user,
+      product_id,
+    );
   }
 
   async checkCommentWriter(comment_no: Comment['comment_no']) {

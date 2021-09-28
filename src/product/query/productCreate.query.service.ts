@@ -87,24 +87,30 @@ export class ProductCreateService {
     return true;
   }
 
-  async createWishData(product: any, user: any): Promise<Wish> {
-    return await getRepository(Wish).save({
+  async createWishData(product: any, user: any) {
+    const result = await getRepository(Wish).save({
       user,
       product,
     });
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  async createCommentData(
-    data: CreateCommentDto,
-    user: any,
-    product: any,
-  ): Promise<Comment> {
+  async createCommentData(data: CreateCommentDto, user: any, product: any) {
     const { comment_content } = data;
-    return await getRepository(Comment).save({
+    const result = await getRepository(Comment).save({
       comment_content,
       user,
       product,
     });
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async createReCommentData(
