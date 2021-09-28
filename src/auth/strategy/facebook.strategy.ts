@@ -27,8 +27,16 @@ export class FaceBookStrategy extends PassportStrategy(Strategy, 'facebook') {
       const userFirstnick = `usernick${Math.floor(Math.random() * 1000000)}`;
       await this.userService.joinUser(profile.id, userFirstnick, 'facebook');
       const user = await this.userService.findUserById(profile.id);
-      return await this.authService.createAccessToken(user);
+      // Access Token
+      const access_token = await this.authService.createAccessToken(user);
+      // Refresh Token
+      const refresh_token = await this.authService.createRefreshToken(user);
+      return { access_token, refresh_token };
     }
-    return this.authService.createAccessToken(user);
+    // Access Token
+    const access_token = await this.authService.createAccessToken(user);
+    // Refresh Token
+    const refresh_token = await this.authService.createRefreshToken(user);
+    return { access_token, refresh_token };
   }
 }

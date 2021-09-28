@@ -47,4 +47,13 @@ export class UserUpdateService {
       .execute();
     return result;
   }
+
+  async userRefreshTokenUpdateData(token: string, user_no: number) {
+    return await getRepository(User)
+      .createQueryBuilder()
+      .update()
+      .set({ user_refresh_token: token })
+      .where(`user_no = ${user_no}`)
+      .execute();
+  }
 }

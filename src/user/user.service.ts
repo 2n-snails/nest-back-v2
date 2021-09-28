@@ -105,4 +105,11 @@ export class UserService {
     const queryData = await this.userUpdateService.deleteUserData(userId);
     return queryData;
   }
+
+  async userRefreshTokenUpdate(token: string, user_no: number) {
+    return await this.userUpdateService.userRefreshTokenUpdateData(
+      token,
+      user_no,
+    );
+  }
 }

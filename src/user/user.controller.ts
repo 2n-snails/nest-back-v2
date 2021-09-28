@@ -47,7 +47,9 @@ export class UserController {
   @Get('auth/kakao/callback')
   @UseGuards(KakaoAuthGuard)
   kakaocallback(@Req() req, @Res() res: Response) {
-    res.cookie('access_token', req.user);
+    const { access_token, refresh_token } = req.user;
+    res.cookie('access_token', access_token);
+    res.cookie('refresh_token', refresh_token);
     res.redirect(process.env.CLIENT_URL);
   }
 
@@ -68,7 +70,9 @@ export class UserController {
   @UseGuards(FacebookAuthGuard)
   @Get('auth/facebook/callback')
   facebookcallback(@Req() req, @Res() res: Response) {
-    res.cookie('access_token', req.user);
+    const { access_token, refresh_token } = req.user;
+    res.cookie('access_token', access_token);
+    res.cookie('refresh_token', refresh_token);
     res.redirect(process.env.CLIENT_URL);
   }
 
