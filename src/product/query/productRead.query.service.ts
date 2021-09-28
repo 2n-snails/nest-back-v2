@@ -1,10 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Comment } from 'src/entity/comment.entity';
 import { Product } from 'src/entity/product.entity';
 import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
+import { FindProductsDto } from '../dto/findProducts.dto';
+import { SearchDto } from '../dto/search.dto';
 
 @Injectable()
 export class ProductReadService {
@@ -18,7 +20,7 @@ export class ProductReadService {
     return seller;
   }
 
-  async findProducts(query: any) {
+  async findProducts(query: FindProductsDto) {
     const { page, limit, parent, child, title } = query;
     const total_count = await this.productTotalCount(query);
     const total_page = Math.ceil(total_count / limit);
@@ -75,7 +77,7 @@ export class ProductReadService {
     return { data, next_page, prev_page, total_count, total_page };
   }
 
-  async productTotalCount(query: any): Promise<number> {
+  async productTotalCount(query: FindProductsDto): Promise<number> {
     const { parent, child, title } = query;
     const count = await getRepository(Product)
       .createQueryBuilder('p')
@@ -98,7 +100,7 @@ export class ProductReadService {
     return data;
   }
 
-  async search(query: any) {
+  async search(query: SearchDto) {
     return await this.findProducts(query);
   }
 
@@ -156,58 +158,42 @@ export class ProductReadService {
     product_id: number,
     user_no: number,
   ): Promise<Wish> {
-    try {
-      return await getRepository(Wish)
-        .createQueryBuilder('w')
-        .select()
-        .where('w.product = :product_no', { product_no: product_id })
-        .andWhere('w.user = :user_no', { user_no })
-        .andWhere('w.deleted = :value', { value: 'N' })
-        .getOne();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(Wish)
+      .createQueryBuilder('w')
+      .select()
+      .where('w.product = :product_no', { product_no: product_id })
+      .andWhere('w.user = :user_no', { user_no })
+      .andWhere('w.deleted = :value', { value: 'N' })
+      .getOne();
   }
 
   async findProductStateData(product_id: number): Promise<State> {
-    try {
-      return await getRepository(State)
-        .createQueryBuilder('s')
-        .select(['s.state'])
-        .where('s.product = :product_id', { product_id })
-        .getOne();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(State)
+      .createQueryBuilder('s')
+      .select(['s.state'])
+      .where('s.product = :product_id', { product_id })
+      .getOne();
   }
 
   async findCommentWriterData(comment_no: number): Promise<Comment> {
-    try {
-      return await getRepository(Comment)
-        .createQueryBuilder('c')
-        .select()
-        .addSelect(['u.user_no'])
-        .leftJoin('c.user', 'u')
-        .where('c.comment_no = :comment_no', { comment_no })
-        .andWhere('c.deleted = :value', { value: 'N' })
-        .getOne();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(Comment)
+      .createQueryBuilder('c')
+      .select()
+      .addSelect(['u.user_no'])
+      .leftJoin('c.user', 'u')
+      .where('c.comment_no = :comment_no', { comment_no })
+      .andWhere('c.deleted = :value', { value: 'N' })
+      .getOne();
   }
 
   async findReCommentData(recomment_no: number): Promise<ReComment> {
-    try {
-      return await getRepository(ReComment)
-        .createQueryBuilder('rc')
-        .select()
-        .addSelect(['u.user_no'])
-        .leftJoin('rc.user', 'u')
-        .where('rc.recomment_no = :recomment_no', { recomment_no })
-        .andWhere('rc.deleted = :value', { value: 'N' })
-        .getOne();
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(ReComment)
+      .createQueryBuilder('rc')
+      .select()
+      .addSelect(['u.user_no'])
+      .leftJoin('rc.user', 'u')
+      .where('rc.recomment_no = :recomment_no', { recomment_no })
+      .andWhere('rc.deleted = :value', { value: 'N' })
+      .getOne();
   }
 }

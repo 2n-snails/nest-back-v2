@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AddressArea } from 'src/entity/address_area.entity';
 import { Category } from 'src/entity/category.entity';
 import { Comment } from 'src/entity/comment.entity';
@@ -10,6 +10,9 @@ import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { getRepository } from 'typeorm';
+import { CreateCommentDto } from '../dto/createComment.dto';
+import { CreateProductDto } from '../dto/createProduct.dto';
+import { CreateReCommentDto } from '../dto/createReComment.dto';
 
 @Injectable()
 export class ProductCreateService {
@@ -28,7 +31,7 @@ export class ProductCreateService {
     return product;
   }
 
-  async createProductImage(data: any, product: Product) {
+  async createProductImage(data: CreateProductDto['image'], product: Product) {
     for (let i = 0; i < data.length; i++) {
       await getRepository(Image).save({
         image_src: data[i],
@@ -39,7 +42,10 @@ export class ProductCreateService {
     return true;
   }
 
-  async createProductCategory(data: any, product: Product) {
+  async createProductCategory(
+    data: CreateProductDto['category'],
+    product: Product,
+  ) {
     for (let i = 0; i < data.length; i++) {
       const category = await getRepository(Category)
         .createQueryBuilder('c')
@@ -60,7 +66,7 @@ export class ProductCreateService {
     return true;
   }
 
-  async createProductDeal(data: any, product: Product) {
+  async createProductDeal(data: CreateProductDto['deal'], product: Product) {
     for (let i = 0; i < data.length; i++) {
       const address = await getRepository(AddressArea)
         .createQueryBuilder('a')
@@ -76,47 +82,35 @@ export class ProductCreateService {
   }
 
   async createWishData(product: any, user: any): Promise<Wish> {
-    try {
-      return await getRepository(Wish).save({
-        user,
-        product,
-      });
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await getRepository(Wish).save({
+      user,
+      product,
+    });
   }
 
   async createCommentData(
-    data: any,
+    data: CreateCommentDto,
     user: any,
     product: any,
   ): Promise<Comment> {
-    try {
-      const { comment_content } = data;
-      return await getRepository(Comment).save({
-        comment_content,
-        user,
-        product,
-      });
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const { comment_content } = data;
+    return await getRepository(Comment).save({
+      comment_content,
+      user,
+      product,
+    });
   }
 
   async createReCommentData(
     user: any,
-    data: any,
+    data: CreateReCommentDto,
     comment: any,
   ): Promise<ReComment> {
-    try {
-      const { recomment_content } = data;
-      return await getRepository(ReComment).save({
-        recomment_content,
-        user,
-        comment,
-      });
-    } catch (e) {
-      throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const { recomment_content } = data;
+    return await getRepository(ReComment).save({
+      recomment_content,
+      user,
+      comment,
+    });
   }
 }

@@ -15,6 +15,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
+import { MainPageDto } from './dto/mainpage.dto';
+import { CreateProductDto } from './dto/createProduct.dto';
+import { SearchDto } from './dto/search.dto';
+import { ProductIdParamDto } from './dto/product.param.dto';
+import { UpdateProductDto } from './dto/updateProduct.dto';
+import { ChangeProductStateDto } from './dto/chageProductState.dto';
+import { CreateCommentDto } from './dto/createComment.dto';
+import { CommentIdParamDto } from './dto/comment.param.dto';
+import { CreateReCommentDto } from './dto/createReComment.dto';
+import { ReCommentIdParamDto } from './dto/recomment.param.dto';
 
 @Controller('product')
 export class ProductController {
@@ -22,7 +32,7 @@ export class ProductController {
 
   // 메인페이지 데이터
   @Get()
-  async mainPageData(@Query() query) {
+  async mainPageData(@Query() query: MainPageDto) {
     const data = await this.productService.getMainPageData(query);
     return data;
   }
@@ -30,7 +40,7 @@ export class ProductController {
   // 상품 등록
   @UseGuards(JwtAccessAuthGuard)
   @Post()
-  async uploadProduct(@Req() req, @Body() data) {
+  async uploadProduct(@Req() req, @Body() data: CreateProductDto) {
     const user_no = req.user.user_no;
     const result = await this.productService.createProduct(user_no, data);
     return { success: result };
@@ -39,14 +49,14 @@ export class ProductController {
   // 상품명 검색
   // ?prodcut-name={data}
   @Get('search')
-  async searchProduct(@Query() query) {
+  async searchProduct(@Query() query: SearchDto) {
     const data = await this.productService.searchProduct(query);
     return data;
   }
 
   // 상품 상세 페이지
   @Get(':product_id')
-  async productDetail(@Param() param) {
+  async productDetail(@Param() param: ProductIdParamDto) {
     const data = await this.productService.findOneProduct(param.product_id);
     return data;
   }
@@ -54,7 +64,11 @@ export class ProductController {
   // 상품 수정
   @UseGuards(JwtAccessAuthGuard)
   @Put(':product_id')
-  async modifyProduct(@Req() req, @Body() data, @Param() param) {
+  async modifyProduct(
+    @Req() req,
+    @Body() data: UpdateProductDto,
+    @Param() param: ProductIdParamDto,
+  ) {
     // TODO: modifyProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
     const result = await this.productService.modifyProduct(
       req.user,
@@ -67,7 +81,7 @@ export class ProductController {
   // 상품 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
-  async deleteProduct(@Req() req, @Param() param) {
+  async deleteProduct(@Req() req, @Param() param: ProductIdParamDto) {
     // TODO: deleteProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
     const result = await this.productService.deleteProduct(
       req.user,
@@ -77,10 +91,14 @@ export class ProductController {
   }
 
   // 상품 상태 수정
-  // state={ reservation, sold_out }, user_no
+  // state={ reservation, sold }, user_no
   @UseGuards(JwtAccessAuthGuard)
   @Patch(':product_id')
-  async changeProductState(@Req() req, @Param() param, @Query() query) {
+  async changeProductState(
+    @Req() req,
+    @Param() param: ProductIdParamDto,
+    @Query() query: ChangeProductStateDto,
+  ) {
     const seller = await this.productService.findProductSeller(
       param.product_id,
     );
@@ -96,7 +114,7 @@ export class ProductController {
   // 상품 찜하기
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
-  async wishProduct(@Req() req, @Param() param) {
+  async wishProduct(@Req() req, @Param() param: ProductIdParamDto) {
     const product_check = await this.productService.checkProductState(
       param.product_id,
     );
@@ -130,7 +148,7 @@ export class ProductController {
   // 상품 찜 취소
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
-  async deleteProductWish(@Req() req, @Param() param) {
+  async deleteProductWish(@Req() req, @Param() param: ProductIdParamDto) {
     const wish_check = await this.productService.checkProductWishList(
       param.product_id,
       req.user.user_no,
@@ -150,7 +168,11 @@ export class ProductController {
   // 상품 댓글 작성
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/comment')
-  async writeProductComment(@Req() req, @Body() data, @Param() param) {
+  async writeProductComment(
+    @Req() req,
+    @Body() data: CreateCommentDto,
+    @Param() param: ProductIdParamDto,
+  ) {
     const product_check = await this.productService.checkProductState(
       param.product_id,
     );
@@ -178,7 +200,7 @@ export class ProductController {
   // 상품 댓글 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':comment_id/comment')
-  async deleteProductComment(@Req() req, @Param() param) {
+  async deleteProductComment(@Req() req, @Param() param: CommentIdParamDto) {
     const comment_check = await this.productService.checkCommentWriter(
       param.comment_id,
     );
@@ -201,7 +223,11 @@ export class ProductController {
   // 상품 대댓글 작성
   @UseGuards(JwtAccessAuthGuard)
   @Post(':comment_id/recomment')
-  async writeProductRecomment(@Req() req, @Body() data, @Param() param) {
+  async writeProductRecomment(
+    @Req() req,
+    @Body() data: CreateReCommentDto,
+    @Param() param: CommentIdParamDto,
+  ) {
     const comment_check = await this.productService.checkCommentWriter(
       param.comment_id,
     );
@@ -222,7 +248,10 @@ export class ProductController {
   // 상품 대댓글 삭제
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':recomment_id/recomment')
-  async deleteProductRecomment(@Req() req, @Param() param) {
+  async deleteProductRecomment(
+    @Req() req,
+    @Param() param: ReCommentIdParamDto,
+  ) {
     const recomment_check = await this.productService.checkReComment(
       param.recomment_id,
     );
