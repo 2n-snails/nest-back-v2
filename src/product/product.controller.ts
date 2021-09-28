@@ -168,7 +168,7 @@ export class ProductController {
         message: `${param.product_id}번 상품이 존재하지 않습니다.`,
       };
     }
-    if (product.state === 'delete' || product.state !== 'sold') {
+    if (product.state !== 'sale') {
       return {
         success: false,
         message: '삭제, 판매 완료된 상품은 찜목록에 추가할 수 없습니다.',
@@ -182,8 +182,13 @@ export class ProductController {
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    await this.productService.createWish(param.product_id, req.user.user_no);
-    return { success: true, message: '상품 찜 추가 성공' };
+    const result = await this.productService.createWish(
+      param.product_id,
+      req.user.user_no,
+    );
+    return result
+      ? { success: true, message: '상품 찜 추가 성공' }
+      : { success: false, message: '상품 찜 실패' };
   }
 
   // 상품 찜 취소
@@ -239,12 +244,14 @@ export class ProductController {
       };
     }
 
-    await this.productService.createComment(
+    const result = await this.productService.createComment(
       data,
       req.user.user_no,
       param.product_id,
     );
-    return { success: true, message: '댓글 작성 성공' };
+    return result
+      ? { success: true, message: '댓글 작성 성공' }
+      : { success: false, message: '작성 실패' };
   }
 
   // 상품 댓글 삭제
