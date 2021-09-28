@@ -23,7 +23,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   ): Promise<any> {
     const user = await this.authService.validateUser(profile.id);
     if (!user) {
-      await this.userService.joinUser(profile.id, profile.username, 'kakao');
+      const userFirstnick = `usernick${Math.floor(Math.random() * 1000000)}`;
+      await this.userService.joinUser(profile.id, userFirstnick, 'kakao');
       const user = await this.userService.findUserById(profile.id);
       return await this.authService.createAccessToken(user);
     }
