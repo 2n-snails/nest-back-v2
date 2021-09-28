@@ -24,6 +24,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { KakaoAuthGuard } from 'src/auth/guard/kakao.auth.guard';
+import { JwtRefreshGuard } from 'src/auth/guard/jwt.refresh.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -77,9 +78,10 @@ export class UserController {
   }
 
   // 리프레시 토큰 재발급
+  @UseGuards(JwtRefreshGuard)
   @Get('auth/refresh-accesstoken')
   refreshAccessToken() {
-    return { success: true, message: 'new accessToken Issuance success' };
+    return { success: true, message: '엑세스 토큰 재발급 성공' };
   }
 
   // ?standard={sale, sold, buy, wish}
