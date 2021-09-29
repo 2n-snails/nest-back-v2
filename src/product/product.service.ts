@@ -17,6 +17,7 @@ import { SearchDto } from './dto/search.dto';
 import { ChangeProductStateDto } from './dto/chageProductState.dto';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { CreateReCommentDto } from './dto/createReComment.dto';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -26,6 +27,7 @@ export class ProductService {
     private readonly productUpdateService: ProductUpdateService,
     private readonly productDeleteService: ProductDeleteService,
     private readonly userService: UserService,
+    private readonly connection: Connection,
   ) {}
   // 메인페이지 데이터 조회
   async getMainPageData(query: MainPageDto) {
@@ -33,22 +35,51 @@ export class ProductService {
   }
 
   async createProduct(user_no: User['user_no'], data: CreateProductDto) {
-    const { product_title, product_content, product_price } = data;
-    const product = await this.productCreateService.createProductData(
-      product_title,
-      product_content,
-      product_price,
-      user_no,
-    );
+    let result: boolean;
+    const query_runner = this.connection.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
 
-    await this.productCreateService.createProductImageData(data.image, product);
-    await this.productCreateService.createProductCategoryData(
-      data.category,
-      product,
-    );
-    await this.productCreateService.createProductDealData(data.deal, product);
-    await this.productCreateService.createProductStateData(product);
-    return true;
+    try {
+      const { product_title, product_content, product_price } = data;
+      const product = await this.productCreateService.createProductData(
+        product_title,
+        product_content,
+        product_price,
+        user_no,
+        query_runner,
+      );
+
+      await this.productCreateService.createProductImageData(
+        data.image,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductCategoryData(
+        data.category,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductDealData(
+        data.deal,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductStateData(
+        product,
+        query_runner,
+      );
+
+      await query_runner.commitTransaction();
+      result = true;
+    } catch (e) {
+      console.log('롤백');
+      await query_runner.rollbackTransaction();
+      result = false;
+    } finally {
+      await query_runner.release();
+      return result;
+    }
   }
 
   async modifyProduct(
@@ -56,47 +87,48 @@ export class ProductService {
     data: UpdateProductDto,
     product_id: Product['product_no'],
   ) {
-    // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
-    const delete_image = await this.productDeleteService.deleteProductImageData(
-      product_id,
-    );
-    const delete_category =
-      await this.productDeleteService.deleteProductCategoryData(product_id);
-    const delete_deal = await this.productDeleteService.deleteProductDealData(
-      product_id,
-    );
+    // // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
+    // const delete_image = await this.productDeleteService.deleteProductImageData(
+    //   product_id,
+    // );
+    // const delete_category =
+    //   await this.productDeleteService.deleteProductCategoryData(product_id);
+    // const delete_deal = await this.productDeleteService.deleteProductDealData(
+    //   product_id,
+    // );
 
-    // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
-    const update_product = await this.productUpdateService.productUpdateData(
-      data,
-      product_id,
-    );
-    const update_image = await this.productCreateService.createProductImageData(
-      data.image,
-      product,
-    );
-    const update_category =
-      await this.productCreateService.createProductCategoryData(
-        data.category,
-        product,
-      );
-    const update_deal = await this.productCreateService.createProductDealData(
-      data.deal,
-      product,
-    );
-    if (
-      delete_image.affected &&
-      delete_category.affected &&
-      delete_category.affected &&
-      update_product.affected &&
-      update_image &&
-      update_category &&
-      update_deal
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    // // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
+    // const update_product = await this.productUpdateService.productUpdateData(
+    //   data,
+    //   product_id,
+    // );
+    // const update_image = await this.productCreateService.createProductImageData(
+    //   data.image,
+    //   product,
+    // );
+    // const update_category =
+    //   await this.productCreateService.createProductCategoryData(
+    //     data.category,
+    //     product,
+    //   );
+    // const update_deal = await this.productCreateService.createProductDealData(
+    //   data.deal,
+    //   product,
+    // );
+    // if (
+    //   delete_image.affected &&
+    //   delete_category.affected &&
+    //   delete_category.affected &&
+    //   update_product.affected &&
+    //   update_image &&
+    //   update_category &&
+    //   update_deal
+    // ) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
+    return true;
   }
 
   async deleteProduct(product_id: Product['product_no']) {

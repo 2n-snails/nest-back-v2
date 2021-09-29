@@ -9,7 +9,7 @@ import { ProductCategory } from 'src/entity/product_category.entity';
 import { ReComment } from 'src/entity/recomment.entity';
 import { State } from 'src/entity/state.entity';
 import { Wish } from 'src/entity/wish.entity';
-import { getRepository } from 'typeorm';
+import { getRepository, QueryRunner } from 'typeorm';
 import { CreateCommentDto } from '../dto/createComment.dto';
 import { CreateProductDto } from '../dto/createProduct.dto';
 import { CreateReCommentDto } from '../dto/createReComment.dto';
@@ -21,26 +21,30 @@ export class ProductCreateService {
     product_content: string,
     product_price: string,
     user_no: any,
+    query_runner: QueryRunner,
   ) {
-    const product = await getRepository(Product).save({
+    const product = getRepository(Product).create({
       product_title,
       product_content,
       product_price,
       user: user_no,
     });
+    await query_runner.manager.save(product);
     return product;
   }
 
   async createProductImageData(
     data: CreateProductDto['image'],
     product: Product,
+    query_runner: QueryRunner,
   ) {
     for (let i = 0; i < data.length; i++) {
-      await getRepository(Image).save({
+      const image = getRepository(Image).create({
         image_src: data[i],
         image_order: i + 1,
         product,
       });
+      await query_runner.manager.save(image);
     }
     return true;
   }
@@ -48,6 +52,7 @@ export class ProductCreateService {
   async createProductCategoryData(
     data: CreateProductDto['category'],
     product: Product,
+    query_runner: QueryRunner,
   ) {
     for (let i = 0; i < data.length; i++) {
       const category = await getRepository(Category)
@@ -56,22 +61,25 @@ export class ProductCreateService {
         .where('c.category_parent_name = :parent', { parent: data[i].parent })
         .andWhere('c.category_child_name = :child', { child: data[i].child })
         .getOne();
-      await getRepository(ProductCategory).save({
+      const result = getRepository(ProductCategory).create({
         category,
         product,
       });
+      await query_runner.manager.save(result);
     }
     return true;
   }
 
-  async createProductStateData(product: Product) {
-    await getRepository(State).save({ product, review_state: 'N' });
+  async createProductStateData(product: Product, query_runner: QueryRunner) {
+    const state = getRepository(State).create({ product, review_state: 'N' });
+    await query_runner.manager.save(state);
     return true;
   }
 
   async createProductDealData(
     data: CreateProductDto['deal'],
     product: Product,
+    query_runner: QueryRunner,
   ) {
     for (let i = 0; i < data.length; i++) {
       const address = await getRepository(AddressArea)
@@ -79,10 +87,11 @@ export class ProductCreateService {
         .select()
         .where('a.area_name = :name', { name: data[i] })
         .getOne();
-      await getRepository(Deal).save({
+      const result = getRepository(Deal).create({
         addressArea: address,
         product,
       });
+      await query_runner.manager.save(result);
     }
     return true;
   }
