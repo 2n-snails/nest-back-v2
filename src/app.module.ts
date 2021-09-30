@@ -1,3 +1,4 @@
+import { ChatModule } from './chat/chat.module';
 import { Chat } from './entity/chat.entity';
 import { Wish } from 'src/entity/wish.entity';
 import { State } from './entity/state.entity';
@@ -25,6 +26,7 @@ import { RavenModule, RavenInterceptor } from 'nest-raven';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
 import { CommonModule } from './common/common.module';
+import { ChatGateway } from './chat/chat.gateway';
 
 @Module({
   imports: [
@@ -74,6 +76,7 @@ import { CommonModule } from './common/common.module';
     UserModule,
     ProductModule,
     CommonModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
