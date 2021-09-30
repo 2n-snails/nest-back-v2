@@ -73,7 +73,6 @@ export class ProductService {
       await query_runner.commitTransaction();
       result = true;
     } catch (e) {
-      console.log('롤백');
       await query_runner.rollbackTransaction();
       result = false;
     } finally {
@@ -87,61 +86,94 @@ export class ProductService {
     data: UpdateProductDto,
     product_id: Product['product_no'],
   ) {
-    // // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
-    // const delete_image = await this.productDeleteService.deleteProductImageData(
-    //   product_id,
-    // );
-    // const delete_category =
-    //   await this.productDeleteService.deleteProductCategoryData(product_id);
-    // const delete_deal = await this.productDeleteService.deleteProductDealData(
-    //   product_id,
-    // );
+    let result: boolean;
+    const query_runner = this.connection.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
 
-    // // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
-    // const update_product = await this.productUpdateService.productUpdateData(
-    //   data,
-    //   product_id,
-    // );
-    // const update_image = await this.productCreateService.createProductImageData(
-    //   data.image,
-    //   product,
-    // );
-    // const update_category =
-    //   await this.productCreateService.createProductCategoryData(
-    //     data.category,
-    //     product,
-    //   );
-    // const update_deal = await this.productCreateService.createProductDealData(
-    //   data.deal,
-    //   product,
-    // );
-    // if (
-    //   delete_image.affected &&
-    //   delete_category.affected &&
-    //   delete_category.affected &&
-    //   update_product.affected &&
-    //   update_image &&
-    //   update_category &&
-    //   update_deal
-    // ) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
-    return true;
+    try {
+      // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
+      await this.productDeleteService.deleteProductImageData(
+        product_id,
+        query_runner,
+      );
+
+      await this.productDeleteService.deleteProductCategoryData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductDealData(
+        product_id,
+        query_runner,
+      );
+
+      // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
+      await this.productUpdateService.productUpdateData(
+        data,
+        product_id,
+        query_runner,
+      );
+      await this.productCreateService.createProductImageData(
+        data.image,
+        product,
+        query_runner,
+      );
+
+      await this.productCreateService.createProductCategoryData(
+        data.category,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductDealData(
+        data.deal,
+        product,
+        query_runner,
+      );
+      await query_runner.commitTransaction();
+      result = true;
+    } catch (e) {
+      await query_runner.rollbackTransaction();
+      result = false;
+    } finally {
+      return result;
+    }
   }
 
   async deleteProduct(product_id: Product['product_no']) {
-    await this.productDeleteService.deleteProductData(product_id);
-    await this.productDeleteService.deleteProductImageData(product_id);
-    await this.productDeleteService.deleteProductCategoryData(product_id);
-    await this.productDeleteService.deleteProductDealData(product_id);
-    await this.productUpdateService.productStateUpdateData(
-      product_id,
-      'delete',
-    );
-    // TODO: 채팅방 구현시 채팅방도 삭제?
-    return true;
+    let result: boolean;
+    const query_runner = this.connection.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
+
+    try {
+      await this.productDeleteService.deleteProductData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductImageData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductCategoryData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductDealData(
+        product_id,
+        query_runner,
+      );
+      await this.productUpdateService.productStateUpdateData(
+        product_id,
+        'delete',
+      );
+      await query_runner.commitTransaction();
+      result = true;
+    } catch (e) {
+      await query_runner.rollbackTransaction();
+      result = false;
+    } finally {
+      return result;
+    }
   }
 
   // 상품명 검색
