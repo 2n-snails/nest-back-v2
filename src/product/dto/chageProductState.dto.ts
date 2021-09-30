@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsNumberString,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class ChangeProductStateDto {
   @IsString()
@@ -12,5 +18,6 @@ export class ChangeProductStateDto {
 
   @ApiProperty({ description: '예약한 유저 번호 또는 구매한 유저 번호' })
   @IsNumberString()
+  @IsOptional()
   user_no?: number;
 }

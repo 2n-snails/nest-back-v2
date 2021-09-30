@@ -22,7 +22,16 @@ export class ProductUpdateService {
 
   async productStateUpdateData(product_no: number, state: string, user?: User) {
     const qb = getRepository(State).createQueryBuilder().update();
-    user ? qb.set({ state, user }) : qb.set({ state });
+    if (user) {
+      qb.set({ state, user });
+    } else {
+      if (state === 'sale') {
+        qb.set({ state, user: null });
+      } else {
+        qb.set({ state });
+      }
+    }
+
     return qb.where('product = :value', { value: product_no }).execute();
   }
 }

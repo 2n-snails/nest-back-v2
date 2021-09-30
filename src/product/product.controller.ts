@@ -126,8 +126,7 @@ export class ProductController {
     return { success: true, message: '상품 삭제 성공' };
   }
 
-  // 상품 상태 수정
-  // state={ reservation, sold }, user_no
+  // state={ reservation, sold, sale }, user_no
   @ApiOperation({
     summary: '상품 거래상태 수정',
   })

@@ -201,6 +201,7 @@ export class ProductService {
   ) {
     const { state, user_no } = query;
     const user = await this.userService.findUserByUserNo(user_no);
+    console.log(user);
     const result = await this.productUpdateService.productStateUpdateData(
       product_id,
       state,
