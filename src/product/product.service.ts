@@ -17,6 +17,7 @@ import { SearchDto } from './dto/search.dto';
 import { ChangeProductStateDto } from './dto/chageProductState.dto';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { CreateReCommentDto } from './dto/createReComment.dto';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -26,83 +27,172 @@ export class ProductService {
     private readonly productUpdateService: ProductUpdateService,
     private readonly productDeleteService: ProductDeleteService,
     private readonly userService: UserService,
+    private readonly connection: Connection,
   ) {}
+  // 메인페이지 데이터 조회
   async getMainPageData(query: MainPageDto) {
-    const data = await this.productReadService.findProducts(query);
-    return data;
+    return await this.productReadService.findProductsData(query);
   }
 
   async createProduct(user_no: User['user_no'], data: CreateProductDto) {
-    const { product_title, product_content, product_price } = data;
-    const product = await this.productCreateService.createProduct(
-      product_title,
-      product_content,
-      product_price,
-      user_no,
-    );
+    let result: boolean;
+    const query_runner = this.connection.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
 
-    await this.productCreateService.createProductImage(data.image, product);
-    await this.productCreateService.createProductCategory(
-      data.category,
-      product,
-    );
-    await this.productCreateService.createProductDeal(data.deal, product);
-    await this.productCreateService.createProductState(product);
-    return true;
+    try {
+      const { product_title, product_content, product_price } = data;
+      const product = await this.productCreateService.createProductData(
+        product_title,
+        product_content,
+        product_price,
+        user_no,
+        query_runner,
+      );
+
+      await this.productCreateService.createProductImageData(
+        data.image,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductCategoryData(
+        data.category,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductDealData(
+        data.deal,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductStateData(
+        product,
+        query_runner,
+      );
+
+      await query_runner.commitTransaction();
+      result = true;
+    } catch (e) {
+      await query_runner.rollbackTransaction();
+      result = false;
+    } finally {
+      await query_runner.release();
+      return result;
+    }
   }
 
   async modifyProduct(
-    user: User,
+    product: Product,
     data: UpdateProductDto,
     product_id: Product['product_no'],
   ) {
-    // TODO: 밑에 3줄 삭제 예정
-    const product = await this.productReadService.findSellerProduct(product_id);
-    if (user.user_no !== product.user.user_no) {
-      return false;
+    let result: boolean;
+    const query_runner = this.connection.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
+
+    try {
+      // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
+      await this.productDeleteService.deleteProductImageData(
+        product_id,
+        query_runner,
+      );
+
+      await this.productDeleteService.deleteProductCategoryData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductDealData(
+        product_id,
+        query_runner,
+      );
+
+      // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
+      await this.productUpdateService.productUpdateData(
+        data,
+        product_id,
+        query_runner,
+      );
+      await this.productCreateService.createProductImageData(
+        data.image,
+        product,
+        query_runner,
+      );
+
+      await this.productCreateService.createProductCategoryData(
+        data.category,
+        product,
+        query_runner,
+      );
+      await this.productCreateService.createProductDealData(
+        data.deal,
+        product,
+        query_runner,
+      );
+      await query_runner.commitTransaction();
+      result = true;
+    } catch (e) {
+      await query_runner.rollbackTransaction();
+      result = false;
+    } finally {
+      return result;
     }
-    // product 테이블 관련 데이터 deleted 값 변경으로 삭제 처리
-    await this.productDeleteService.deleteProductImage(product_id);
-    await this.productDeleteService.deleteProductCategory(product_id);
-    await this.productDeleteService.deleteProductDeal(product_id);
-    // product 테이블 값 변경, 이미지, 거래지역, 카테고리 데이터 생성
-    await this.productUpdateService.productUpdate(data, product_id);
-    await this.productCreateService.createProductImage(data.image, product);
-    await this.productCreateService.createProductCategory(
-      data.category,
-      product,
-    );
-    await this.productCreateService.createProductDeal(data.deal, product);
-    return true;
   }
 
-  async deleteProduct(user: User, product_id: Product['product_no']) {
-    // TODO: 밑에 3줄 삭제 예정
-    const product = await this.productReadService.findSellerProduct(product_id);
-    if (user.user_no !== product.user.user_no) {
-      return false;
+  async deleteProduct(product_id: Product['product_no']) {
+    let result: boolean;
+    const query_runner = this.connection.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
+
+    try {
+      await this.productDeleteService.deleteProductData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductImageData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductCategoryData(
+        product_id,
+        query_runner,
+      );
+      await this.productDeleteService.deleteProductDealData(
+        product_id,
+        query_runner,
+      );
+      await this.productUpdateService.productStateUpdateData(
+        product_id,
+        'delete',
+      );
+      await query_runner.commitTransaction();
+      result = true;
+    } catch (e) {
+      await query_runner.rollbackTransaction();
+      result = false;
+    } finally {
+      return result;
     }
-    await this.productDeleteService.deleteProduct(product_id);
-    await this.productDeleteService.deleteProductImage(product_id);
-    await this.productDeleteService.deleteProductCategory(product_id);
-    await this.productDeleteService.deleteProductDeal(product_id);
-    await this.productUpdateService.productStateUpdate(product_id, 'delete');
-    // TODO: 채팅방 구현시 채팅방도 삭제?
-    return true;
   }
 
+  // 상품명 검색
   async searchProduct(query: SearchDto) {
-    return await this.productReadService.search(query);
+    return await this.productReadService.searchProductsData(query);
   }
 
+  // 상품 상세정보 조회
   async findOneProduct(product_id: Product['product_no']) {
-    const product = await this.productReadService.findOneProduct(product_id);
-    // TODO: 댓글 목록 가져오기
-    const comment = await this.productReadService.findAllProductComment(
+    const product = await this.productReadService.findOneProductData(
       product_id,
     );
-    // TODO: 판매자의 별점 구하기 -> 분리 안함
-    return { product, comment };
+    const comments = await this.productReadService.findAllProductCommentData(
+      product_id,
+    );
+    const review_avg = await this.productReadService.findProductSellerScoreData(
+      product.user.user_no,
+    );
+    return { product, comments, review_avg };
   }
 
   async changeProductState(
@@ -111,7 +201,8 @@ export class ProductService {
   ) {
     const { state, user_no } = query;
     const user = await this.userService.findUserByUserNo(user_no);
-    const result = await this.productUpdateService.productStateUpdate(
+    console.log(user);
+    const result = await this.productUpdateService.productStateUpdateData(
       product_id,
       state,
       user,
@@ -121,14 +212,13 @@ export class ProductService {
       : { success: false, message: '상품 상태 수정 실패' };
   }
 
-  async findProductSeller(product_id: Product['product_no']) {
-    return await this.productReadService.findSellerProduct(product_id);
+  async findProductAndSeller(product_id: Product['product_no']) {
+    return await this.productReadService.findProductInfoAndSellerData(
+      product_id,
+    );
   }
 
-  async createWish(
-    product_id: Product['product_no'],
-    user: User['user_no'],
-  ): Promise<Wish> {
+  async createWish(product_id: Product['product_no'], user: User['user_no']) {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
@@ -140,21 +230,18 @@ export class ProductService {
     return await this.productReadService.findProductStateData(product_id);
   }
 
-  async checkProductWishList(
+  async checkWishList(
     product_id: Product['product_no'],
     user_no: User['user_no'],
   ): Promise<Wish> {
-    return await this.productReadService.findProductWishListData(
-      product_id,
-      user_no,
-    );
+    return await this.productReadService.findWishListData(product_id, user_no);
   }
 
   async createComment(
     data: CreateCommentDto,
     user: User['user_no'],
     product_id: Product['product_no'],
-  ): Promise<Comment> {
+  ) {
     return await this.productCreateService.createCommentData(
       data,
       user,
@@ -182,7 +269,7 @@ export class ProductService {
     );
   }
 
-  async checkReComment(
+  async checkReCommentWriter(
     recomment_no: ReComment['recomment_no'],
   ): Promise<ReComment> {
     return await this.productReadService.findReCommentData(recomment_no);

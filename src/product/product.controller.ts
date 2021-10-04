@@ -38,8 +38,7 @@ export class ProductController {
   })
   @Get()
   async mainPageData(@Query() query: MainPageDto) {
-    const data = await this.productService.getMainPageData(query);
-    return data;
+    return await this.productService.getMainPageData(query);
   }
 
   // 상품 등록
@@ -52,7 +51,9 @@ export class ProductController {
   async uploadProduct(@Req() req, @Body() data: CreateProductDto) {
     const user_no = req.user.user_no;
     const result = await this.productService.createProduct(user_no, data);
-    return { success: result };
+    return result
+      ? { success: true, message: '상품 등록 성공' }
+      : { success: false, message: '상품 등록 실패' };
   }
 
   // 상품명 검색
@@ -62,8 +63,7 @@ export class ProductController {
   })
   @Get('search')
   async searchProduct(@Query() query: SearchDto) {
-    const data = await this.productService.searchProduct(query);
-    return data;
+    return await this.productService.searchProduct(query);
   }
 
   // 상품 상세 페이지
@@ -88,13 +88,22 @@ export class ProductController {
     @Body() data: UpdateProductDto,
     @Param() param: ProductIdParamDto,
   ) {
-    // TODO: modifyProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
+    const product = await this.productService.findProductAndSeller(
+      param.product_id,
+    );
+
+    if (product.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+
     const result = await this.productService.modifyProduct(
-      req.user,
+      product,
       data,
       param.product_id,
     );
-    return result ? { success: true } : { success: false };
+    return result
+      ? { success: true, message: '상품 수정 성공' }
+      : { success: false, message: '상품 수정 실패' };
   }
 
   // 상품 삭제
@@ -105,16 +114,19 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id')
   async deleteProduct(@Req() req, @Param() param: ProductIdParamDto) {
-    // TODO: deleteProduct함수로 req.user전달 안하고 여기서 체크 후 익셉션 처리하기.
-    const result = await this.productService.deleteProduct(
-      req.user,
+    const product = await this.productService.findProductAndSeller(
       param.product_id,
     );
-    return result ? { success: true } : { success: false };
+
+    if (product.user.user_no !== req.user.user_no) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+
+    await this.productService.deleteProduct(param.product_id);
+    return { success: true, message: '상품 삭제 성공' };
   }
 
-  // 상품 상태 수정
-  // state={ reservation, sold }, user_no
+  // state={ reservation, sold, sale }, user_no
   @ApiOperation({
     summary: '상품 거래상태 수정',
   })
@@ -126,7 +138,7 @@ export class ProductController {
     @Param() param: ProductIdParamDto,
     @Query() query: ChangeProductStateDto,
   ) {
-    const seller = await this.productService.findProductSeller(
+    const seller = await this.productService.findProductAndSeller(
       param.product_id,
     );
     if (seller.user.user_no !== req.user.user_no) {
@@ -146,34 +158,36 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Post(':product_id/wish')
   async wishProduct(@Req() req, @Param() param: ProductIdParamDto) {
-    const product_check = await this.productService.checkProductState(
+    const product = await this.productService.checkProductState(
       param.product_id,
     );
-    if (!product_check) {
+    if (!product) {
       return {
         success: false,
         message: `${param.product_id}번 상품이 존재하지 않습니다.`,
       };
     }
-    if (
-      product_check.state !== 'sale' &&
-      product_check.state !== 'reservation'
-    ) {
+    if (product.state !== 'sale') {
       return {
         success: false,
         message: '삭제, 판매 완료된 상품은 찜목록에 추가할 수 없습니다.',
       };
     }
 
-    const wish_check = await this.productService.checkProductWishList(
+    const wish_check = await this.productService.checkWishList(
       param.product_id,
       req.user.user_no,
     );
     if (wish_check) {
       return { success: false, message: '이미 찜한 상품입니다.' };
     }
-    await this.productService.createWish(param.product_id, req.user.user_no);
-    return { success: true, message: '상품 찜 추가 성공' };
+    const result = await this.productService.createWish(
+      param.product_id,
+      req.user.user_no,
+    );
+    return result
+      ? { success: true, message: '상품 찜 추가 성공' }
+      : { success: false, message: '상품 찜 실패' };
   }
 
   // 상품 찜 취소
@@ -184,13 +198,14 @@ export class ProductController {
   @UseGuards(JwtAccessAuthGuard)
   @Delete(':product_id/wish')
   async deleteProductWish(@Req() req, @Param() param: ProductIdParamDto) {
-    const wish_check = await this.productService.checkProductWishList(
+    const wish_check = await this.productService.checkWishList(
       param.product_id,
       req.user.user_no,
     );
     if (!wish_check) {
       return { success: false, message: '찜 목록에 없는 상품입니다.' };
     }
+
     const result = await this.productService.deletedWish(
       param.product_id,
       req.user.user_no,
@@ -228,12 +243,14 @@ export class ProductController {
       };
     }
 
-    await this.productService.createComment(
+    const result = await this.productService.createComment(
       data,
       req.user.user_no,
       param.product_id,
     );
-    return { success: true, message: '댓글 작성 성공' };
+    return result
+      ? { success: true, message: '댓글 작성 성공' }
+      : { success: false, message: '작성 실패' };
   }
 
   // 상품 댓글 삭제
@@ -253,10 +270,11 @@ export class ProductController {
         message: '이미 삭제된 댓글이거나 존재하지 않는 댓글입니다.',
       };
     }
-    console.log(comment_check);
+
     if (comment_check.user.user_no !== req.user.user_no) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
+
     const result = await this.productService.deleteComment(param.comment_id);
     return result.affected
       ? { success: true, message: '댓글 삭제 성공' }
@@ -303,7 +321,7 @@ export class ProductController {
     @Req() req,
     @Param() param: ReCommentIdParamDto,
   ) {
-    const recomment_check = await this.productService.checkReComment(
+    const recomment_check = await this.productService.checkReCommentWriter(
       param.recomment_id,
     );
     if (!recomment_check) {
