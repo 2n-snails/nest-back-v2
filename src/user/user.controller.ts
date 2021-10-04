@@ -47,7 +47,7 @@ export class UserController {
   })
   @Get('auth/kakao/callback')
   @UseGuards(KakaoAuthGuard)
-  kakaocallback(@Req() req, @Res() res: Response) {
+  kakaocallback(@Req() req: any, @Res() res: Response) {
     const { access_token, refresh_token } = req.user;
     res.cookie('access_token', access_token);
     res.cookie('refresh_token', refresh_token);
@@ -70,7 +70,7 @@ export class UserController {
   })
   @UseGuards(FacebookAuthGuard)
   @Get('auth/facebook/callback')
-  facebookcallback(@Req() req, @Res() res: Response) {
+  facebookcallback(@Req() req: any, @Res() res: Response) {
     const { access_token, refresh_token } = req.user;
     res.cookie('access_token', access_token);
     res.cookie('refresh_token', refresh_token);
@@ -107,7 +107,7 @@ export class UserController {
   @UseGuards(JwtAccessAuthGuard)
   @Get('my-info/:user_id')
   async getMyInfo(
-    @Req() req,
+    @Req() req: any,
     @Param() param: UserIdParam,
   ): Promise<User | undefined> {
     const paramUserId = Number(param.user_id);
@@ -127,10 +127,10 @@ export class UserController {
   @UseGuards(JwtAccessAuthGuard)
   @Patch('my-info/:user_id/image')
   async patchProfileImage(
-    @Req() req,
+    @Req() req: any,
     @Body() updateUserImageDto: UpdateUserImageDto,
     @Param() param: UserIdParam,
-  ) {
+  ): Promise<any> {
     const paramUserId = Number(param.user_id);
     const tokenUserId = req.user.user_no;
     const { image } = updateUserImageDto;
@@ -149,10 +149,10 @@ export class UserController {
   @UseGuards(JwtAccessAuthGuard)
   @Patch('my-info/:user_id/nickname')
   async patchNickName(
-    @Req() req,
+    @Req() req: any,
     @Param() param: UserIdParam,
     @Body() updateUserNickDto: UpdateUserNickDto,
-  ) {
+  ): Promise<any> {
     const paramUserId = Number(param.user_id);
     const tokenUserId = req.user.user_no;
     const { userNick } = updateUserNickDto;
@@ -181,10 +181,10 @@ export class UserController {
   @UseGuards(JwtAccessAuthGuard)
   @Post('review/:user_id')
   async writeReview(
-    @Req() req,
+    @Req() req: any,
     @Body() createReviewDto: CreateReviewDto,
     @Param() param: UserIdParam,
-  ) {
+  ): Promise<any> {
     const writer = req.user.user_no;
     const receiver = Number(param.user_id);
     return await this.userService.reviewWrite(
@@ -201,7 +201,7 @@ export class UserController {
   })
   @UseGuards(JwtAccessAuthGuard)
   @Get('logout')
-  async logout(@Req() req: any) {
+  async logout(@Req() req: any): Promise<any> {
     const userId = req.user.user_no;
     const result = await this.userService.logoutUser(userId);
     if (result.affected) {
@@ -217,7 +217,7 @@ export class UserController {
   })
   @UseGuards(JwtAccessAuthGuard)
   @Get('resign')
-  async resign(@Req() req: any) {
+  async resign(@Req() req: any): Promise<any> {
     const userId = req.user.user_no;
     const result = await this.userService.deleteUser(userId);
     if (result.affected) {
