@@ -69,6 +69,8 @@ export class UserService {
     );
     if (result) {
       return { success: true, message: '후기 작성 성공' };
+    } else {
+      return { success: false, message: '후기 작성 실패' };
     }
   }
   async findUserReview(paramUserId: number): Promise<any> {
