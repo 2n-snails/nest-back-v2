@@ -96,7 +96,7 @@ export class ProductCreateService {
     return true;
   }
 
-  async createWishData(product: any, user: any) {
+  async createWishData(product: any, user: any): Promise<boolean> {
     const result = await getRepository(Wish).save({
       user,
       product,
@@ -108,7 +108,11 @@ export class ProductCreateService {
     }
   }
 
-  async createCommentData(data: CreateCommentDto, user: any, product: any) {
+  async createCommentData(
+    data: CreateCommentDto,
+    user: any,
+    product: any,
+  ): Promise<boolean> {
     const { comment_content } = data;
     const result = await getRepository(Comment).save({
       comment_content,

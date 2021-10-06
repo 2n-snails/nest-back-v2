@@ -34,7 +34,10 @@ export class ProductService {
     return await this.productReadService.findProductsData(query);
   }
 
-  async createProduct(user_no: User['user_no'], data: CreateProductDto) {
+  async createProduct(
+    user_no: User['user_no'],
+    data: CreateProductDto,
+  ): Promise<boolean> {
     let result: boolean;
     const query_runner = this.connection.createQueryRunner();
     await query_runner.connect();
@@ -85,7 +88,7 @@ export class ProductService {
     product: Product,
     data: UpdateProductDto,
     product_id: Product['product_no'],
-  ) {
+  ): Promise<boolean> {
     let result: boolean;
     const query_runner = this.connection.createQueryRunner();
     await query_runner.connect();
@@ -139,7 +142,7 @@ export class ProductService {
     }
   }
 
-  async deleteProduct(product_id: Product['product_no']) {
+  async deleteProduct(product_id: Product['product_no']): Promise<boolean> {
     let result: boolean;
     const query_runner = this.connection.createQueryRunner();
     await query_runner.connect();
@@ -212,13 +215,18 @@ export class ProductService {
       : { success: false, message: '상품 상태 수정 실패' };
   }
 
-  async findProductAndSeller(product_id: Product['product_no']) {
+  async findProductAndSeller(
+    product_id: Product['product_no'],
+  ): Promise<Product> {
     return await this.productReadService.findProductInfoAndSellerData(
       product_id,
     );
   }
 
-  async createWish(product_id: Product['product_no'], user: User['user_no']) {
+  async createWish(
+    product_id: Product['product_no'],
+    user: User['user_no'],
+  ): Promise<boolean> {
     return await this.productCreateService.createWishData(product_id, user);
   }
 
@@ -241,7 +249,7 @@ export class ProductService {
     data: CreateCommentDto,
     user: User['user_no'],
     product_id: Product['product_no'],
-  ) {
+  ): Promise<boolean> {
     return await this.productCreateService.createCommentData(
       data,
       user,
@@ -249,7 +257,9 @@ export class ProductService {
     );
   }
 
-  async checkCommentWriter(comment_no: Comment['comment_no']) {
+  async checkCommentWriter(
+    comment_no: Comment['comment_no'],
+  ): Promise<Comment> {
     return await this.productReadService.findCommentWriterData(comment_no);
   }
 
