@@ -7,5 +7,5 @@ export class MyPageStandardDTO {
   })
   @IsNotEmpty()
   @ApiProperty({ enum: ['sale', 'sold', 'buy', 'wish'] })
-  standard: string;
+  standard: 'sale' | 'sold' | 'buy' | 'wish';
 }
