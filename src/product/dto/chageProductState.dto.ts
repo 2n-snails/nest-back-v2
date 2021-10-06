@@ -1,3 +1,4 @@
+import { StateType } from './../../entity/state.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsIn,
@@ -9,12 +10,13 @@ import {
 
 export class ChangeProductStateDto {
   @IsString()
-  @IsIn(['reservation', 'sold', 'sale'], {
-    message: 'sold(판매완료), reservation(예약), sale(판매중)',
+  @IsIn(['sale', 'sold', 'wish', 'reservation', 'delete'], {
+    message:
+      'sale(판매중), sold(판매완료), wish(찜), reservation(예약), delete(삭제됨)',
   })
   @IsNotEmpty()
-  @ApiProperty({ enum: ['reservation', 'sold', 'sale'] })
-  state: string;
+  @ApiProperty({ enum: ['sale', 'sold', 'wish', 'reservation', 'delete'] })
+  state: StateType;
 
   @ApiProperty({ description: '예약한 유저 번호 또는 구매한 유저 번호' })
   @IsNumberString()

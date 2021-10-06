@@ -1,3 +1,4 @@
+import { StateType } from './../../entity/state.entity';
 import { Injectable } from '@nestjs/common';
 import { Product } from 'src/entity/product.entity';
 import { State } from 'src/entity/state.entity';
@@ -20,7 +21,11 @@ export class ProductUpdateService {
     });
   }
 
-  async productStateUpdateData(product_no: number, state: string, user?: User) {
+  async productStateUpdateData(
+    product_no: number,
+    state: StateType,
+    user?: User,
+  ) {
     const qb = getRepository(State).createQueryBuilder().update();
     if (user) {
       qb.set({ state, user });
