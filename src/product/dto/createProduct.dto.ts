@@ -7,14 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-
-class CategoryArrayClass {
-  @IsString()
-  parent: string;
-
-  @IsString()
-  child: string;
-}
+import { CategoryArrayClass } from '../common/category.type';
 
 export class CreateProductDto {
   @ApiProperty({ description: '상품 이름' })
