@@ -9,13 +9,19 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
+export type StateType = 'sale' | 'sold' | 'wish' | 'reservation' | 'delete';
+
 @Entity()
 export class State {
   @PrimaryGeneratedColumn()
   state_no: number;
 
-  @Column({ type: 'varchar', default: 'sale', length: 20 })
-  state: string;
+  @Column({
+    type: 'enum',
+    enum: ['sale', 'sold', 'wish', 'reservation', 'delete'],
+    default: 'sale',
+  })
+  state: StateType;
 
   @Column({ type: 'varchar', nullable: true })
   review_state: string;
