@@ -1,3 +1,4 @@
+import { ReturnDTO } from './dto/return.dto';
 import { FacebookAuthGuard } from './../auth/guard/facebook.auth.guard';
 import { MyPageStandardDTO } from './dto/myPageStandard.dto';
 import { CreateReviewDto } from './dto/createReview.dto';
@@ -130,7 +131,7 @@ export class UserController {
     @Req() req: any,
     @Body() updateUserImageDto: UpdateUserImageDto,
     @Param() param: UserIdParam,
-  ): Promise<any> {
+  ): Promise<ReturnDTO> {
     const paramUserId = Number(param.user_id);
     const tokenUserId = req.user.user_no;
     const { image } = updateUserImageDto;
@@ -152,7 +153,7 @@ export class UserController {
     @Req() req: any,
     @Param() param: UserIdParam,
     @Body() updateUserNickDto: UpdateUserNickDto,
-  ): Promise<any> {
+  ): Promise<ReturnDTO> {
     const paramUserId = Number(param.user_id);
     const tokenUserId = req.user.user_no;
     const { userNick } = updateUserNickDto;
@@ -184,7 +185,7 @@ export class UserController {
     @Req() req: any,
     @Body() createReviewDto: CreateReviewDto,
     @Param() param: UserIdParam,
-  ): Promise<any> {
+  ): Promise<ReturnDTO> {
     const writer = req.user.user_no;
     const receiver = Number(param.user_id);
     return await this.userService.reviewWrite(
@@ -201,7 +202,7 @@ export class UserController {
   })
   @UseGuards(JwtAccessAuthGuard)
   @Get('logout')
-  async logout(@Req() req: any): Promise<any> {
+  async logout(@Req() req: any): Promise<ReturnDTO> {
     const userId = req.user.user_no;
     const result = await this.userService.logoutUser(userId);
     if (result.affected) {
@@ -217,7 +218,7 @@ export class UserController {
   })
   @UseGuards(JwtAccessAuthGuard)
   @Get('resign')
-  async resign(@Req() req: any): Promise<any> {
+  async resign(@Req() req: any): Promise<ReturnDTO> {
     const userId = req.user.user_no;
     const result = await this.userService.deleteUser(userId);
     if (result.affected) {
