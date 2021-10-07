@@ -7,6 +7,9 @@ import {
 
 @WebSocketGateway(4000, {
   namespace: 'chat',
+  cors: {
+    origin: 'http://localhost:4000',
+  },
 })
 export class ChatGateway {
   @WebSocketServer()

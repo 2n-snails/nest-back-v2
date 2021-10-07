@@ -1,4 +1,4 @@
-const socket = io('http://localhsot:4000');
+const socket = io('ws://localhsot:4000');
 
 const message = document.getElementById('message');
 const messages = document.getElementById('messages');
