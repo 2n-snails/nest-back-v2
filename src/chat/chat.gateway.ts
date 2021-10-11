@@ -7,11 +7,10 @@ import {
 import { Server } from 'socket.io';
 
 // 특정 사용자 끼리만 채팅이 가능하도록 설계
-@WebSocketGateway(8000, {
+@WebSocketGateway({
   cors: {
-    origin: 'http://localhost:4000',
+    origin: '*',
   },
-  transports: ['websocket'],
 })
 export class ChatGateway {
   @WebSocketServer()
