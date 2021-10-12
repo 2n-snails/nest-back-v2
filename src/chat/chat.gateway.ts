@@ -1,5 +1,9 @@
+import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
+import { Req, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -12,14 +16,21 @@ import { Server } from 'socket.io';
     origin: '*',
   },
 })
-export class ChatGateway {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  handleConnection(client: any, ...args: any[]) {
+    console.log(client, args);
+    console.log('connected');
+  }
+  handleDisconnect(client: any) {
+    console.log(client);
+    console.log('disconnected');
+  }
+
   @SubscribeMessage('message')
   handleEvent(@MessageBody() data: string): void {
-    console.log(data);
-
     this.server.emit('message', data);
   }
 }
