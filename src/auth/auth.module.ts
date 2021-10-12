@@ -17,7 +17,6 @@ import { KakaoStrategy } from './strategy/kakao.strategy';
     JwtModule.register({
       secret: process.env.JWT_SECRET,
     }),
-    UserModule,
   ],
   providers: [AuthService, JwtStrategy, KakaoStrategy, FaceBookStrategy],
   exports: [PassportModule, JwtModule, AuthService],
