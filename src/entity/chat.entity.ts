@@ -12,7 +12,7 @@ import {
 @Entity()
 export class Chat {
   @PrimaryGeneratedColumn()
-  area_no: number;
+  chat_no: number;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
