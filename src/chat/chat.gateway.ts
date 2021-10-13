@@ -12,6 +12,8 @@ import { Server } from 'socket.io';
 
 // 특정 사용자 끼리만 채팅이 가능하도록 설계
 @WebSocketGateway({
+  namespace: 'chat',
+  transports: ['websocket'],
   cors: {
     origin: '*',
   },
@@ -21,11 +23,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   handleConnection(client: any, ...args: any[]) {
-    console.log(client, args);
+    // console.log(client, args);
     console.log('connected');
   }
   handleDisconnect(client: any) {
-    console.log(client);
+    // console.log(client);
     console.log('disconnected');
   }
 
