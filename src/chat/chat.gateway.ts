@@ -1,5 +1,3 @@
-import { JwtAccessAuthGuard } from 'src/auth/guard/jwt.access.guard';
-import { Req, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -9,10 +7,10 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { onlineMap } from './onlineMap';
 
 // 특정 사용자 끼리만 채팅이 가능하도록 설계
 @WebSocketGateway({
-  namespace: 'chat',
   transports: ['websocket'],
   cors: {
     origin: '*',
@@ -23,7 +21,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   handleConnection(client: any, ...args: any[]) {
-    // console.log(client, args);
+    console.log(`my id is ${client.id}`);
+    onlineMap.push(client.id);
     console.log('connected');
   }
   handleDisconnect(client: any) {
@@ -33,6 +32,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('message')
   handleEvent(@MessageBody() data: string): void {
+    this.server.emit('message', data);
+  }
+
+  @SubscribeMessage('createRoom')
+  createRoom(@MessageBody() data: string): void {
     this.server.emit('message', data);
   }
 }
