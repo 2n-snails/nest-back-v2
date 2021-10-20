@@ -27,6 +27,7 @@ import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
 import { CommonModule } from './common/common.module';
 import { ChatGateway } from './chat/chat.gateway';
+import { SocketClient } from './entity/socket.entity';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { ChatGateway } from './chat/chat.gateway';
       State,
       User,
       Wish,
+      SocketClient,
     ]),
     AuthModule,
     RavenModule,
