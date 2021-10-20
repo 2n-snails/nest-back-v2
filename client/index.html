@@ -14,7 +14,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
     <script>
-      const socket = io('ws://localhost:4000', { transports: ['websocket']});
+      const socket = io('ws://localhost:4000', {
+        transports: ['websocket'],
+        auth: {
+          token: "Bearer " + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoxLCJpYXQiOjE2MzQ3MTMyMTcsImV4cCI6MTYzNDcxNjgxN30.WjHiNTUtiwS-s5I9b8QuFAIDgHaAWUSv_NV8wTqb_xA',
+        },
+      });
 
       socket.on('connect', function() {
         console.log('Connected');
