@@ -1,6 +1,6 @@
 import { Chat } from './../entity/chat.entity';
 import { HttpException, Injectable } from '@nestjs/common';
-import { getManager, getRepository } from 'typeorm';
+import { getConnection, getManager, getRepository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -100,6 +100,18 @@ export class ChatService {
       .createQueryBuilder()
       .where(`user_no = ${user_no}`)
       .getOne();
+    return result;
+  }
+
+  async insertMessage(chat_no: number, content: JSON) {
+    const result = await getConnection()
+      .createQueryBuilder()
+      .update(Chat)
+      .set({
+        content,
+      })
+      .where(`chat.chat_no = :chat_no`, { chat_no })
+      .execute();
     return result;
   }
 }

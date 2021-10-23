@@ -61,6 +61,9 @@ export class ChatController {
     return result;
   }
 
+  @ApiOperation({
+    summary: '채팅 내용 업데이트',
+  })
   @Post(':user_id/chatRoom/:room_id')
   async insertMessage(
     @Req() req: any,
@@ -68,6 +71,19 @@ export class ChatController {
     @Param('room_id') roomId: string,
     @Body() body: any,
   ) {
-    // const result = this.chatService.
+    const paramUserId = Number(user_id);
+    const tokenUserId = req.user.user_no;
+
+    if (!paramUserId === tokenUserId) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    const { content } = body;
+
+    const result = await this.chatService.insertMessage(
+      parseInt(roomId),
+      content,
+    );
+
+    return result;
   }
 }
