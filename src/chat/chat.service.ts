@@ -16,6 +16,8 @@ export class ChatService {
     // 이게 유저 번호기준으로 seller or buyer에 값이 있을때 찾는건데 목록 찾고 내가 아닌 다른 사람 이름까지 조회해야 채팅방 이름을 보여줄수 있을듯
     // const result = await getRepository(Chat)
     //   .createQueryBuilder('chat')
+    //   .leftJoinAndSelect('chat.seller', 'seller')
+    //   .leftJoinAndSelect('chat.buyer', 'buyer')
     //   .where(`chat.seller = :seller OR chat.buyer = :buyer`, {
     //     seller: id,
     //     buyer: id,
