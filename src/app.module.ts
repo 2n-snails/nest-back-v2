@@ -52,7 +52,7 @@ import { SocketClient } from './entity/socket.entity';
       migrations: [__dirname + '/src/migrations/*.ts'],
       cli: { migrationsDir: 'src/migrations' },
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
       logging: true,
       keepConnectionAlive: true,
     }),

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대화목록 및 채팅창</title>
+</head>
+<body>
+  <h1 id="my_chat_list">나의 채팅 목록</h1>
+  <div = id="chat">
+    <h1 id="my_chat">채팅창</h1>
+    <p id="now_chat_room"></p>
+    <input type="text" id="message" placeholder="메시지 작성하셈"/>
+    <input type="hidden" id="room_name" />
+    <button id="send_message" onclick="">전송</button>
+    <button id="close_room">현재 채팅방 나가기</button>
+  </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+<script>
+  window.onload = function () {
+    let config = {
+      headers: {
+        "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoyLCJpYXQiOjE2MzQ5NjgzNDQsImV4cCI6MTYzNDk3MTk0NH0.kqbrVh9Mmp3OdAk8fvfYC2qv9OeTLkYrnSohjtbZSjo",
+      },
+    };
+    axios
+      .get('http://localhost:4000/api/v2/chat/2/chatRoom', config)
+      .then(res => {
+        const my_chat_list = document.getElementById('my_chat_list');
+        console.log(res.data);
+        for (let i = 0; i < res.data.length; i++) {
+          const p = document.createElement('p');
+          p.innerHTML = `${res.data[i].user_nick}과(와) 의 채팅`;
+          my_chat_list.appendChild(p);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    const query_string = getUrlParams();
+    if (query_string.seller_no) {
+      console.log('바로 채팅 열기');
+      const seller = Number(query_string.seller_no);
+      const buyer = 2; // 로그인했다고 가정한 유저임
+
+      const room_info = {
+        room_name: `seller: ${seller}, buyer: ${buyer}`,
+        seller,
+        buyer,
+        product: query_string.product_no,
+        createdAt: new Date(),
+      };
+      socket.emit('createNewChatRoom', room_info);
+    } else {
+      console.log('채팅 목록에서 새로운 채팅 생성하기');
+    }
+  }
+
+  function getUrlParams() {     
+    var params = {};  
+    
+    window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+    	function(str, key, value) { 
+        params[key] = value; 
+      }
+    );     
+    
+    return params; 
+  }
+
+  // 소켓 연결
+  const socket = io('ws://localhost:4000', {
+    transports: ['websocket'],
+    auth: {
+      token: "Bearer " + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoyLCJpYXQiOjE2MzQ5NjgzNDQsImV4cCI6MTYzNDk3MTk0NH0.kqbrVh9Mmp3OdAk8fvfYC2qv9OeTLkYrnSohjtbZSjo',
+    },
+  });
+
+  socket.on('chatRoomMadeByMe', (data) => {
+    console.log(data);
+    console.log('소켓 이벤트 발생');
+    const h1 = document.getElementById('my_chat_list');
+    const h5 = document.createElement('h5');
+    h5.innerHTML = `${data.room_name}과(와) 의 채팅`;
+
+    h1.appendChild(h5);
+
+    const chat_name = document.getElementById('my_chat');
+
+    const p = document.getElementById('now_chat_room');
+    p.innerHTML = `${data.room_name}과 채팅중`;
+    chat_name.appendChild(p);
+
+    const input = document.getElementById('room_name');
+    input.value = data.room_no;
+  });
+</script>
+</html>

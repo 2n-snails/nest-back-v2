@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -6,7 +7,8 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { UserService } from 'src/user/user.service';
 import { ChatService } from './chat.service';
 
 // 특정 사용자 끼리만 채팅이 가능하도록 설계
@@ -17,7 +19,10 @@ import { ChatService } from './chat.service';
   },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly userService: UserService,
+  ) {}
   @WebSocketServer()
   server: Server;
 
@@ -43,8 +48,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message', data);
   }
 
-  @SubscribeMessage('createRoom')
-  createRoom(@MessageBody() data: string): void {
-    this.server.emit('message', data);
+  @SubscribeMessage('createNewChatRoom')
+  async createRoom(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { seller, buyer, product } = data;
+    const chat_room = await this.chatService.findOneChatRoom(seller, buyer);
+    const seller_name = await this.userService.findUserByUserNo(seller);
+    const buyer_name = await this.userService.findUserByUserNo(buyer);
+    if (!chat_room) {
+      // //디비에 새로운 채팅방 정보 넣기
+      const new_chat = await this.chatService.createNewCaht(
+        seller,
+        buyer,
+        product,
+      );
+      console.log(new_chat);
+      client.join(`${new_chat.chat_no}`);
+
+      // 새로운 채팅 목록 프론트로 보내기
+      // 만든사람: 구매 희망유저, 받는사람: 판매자
+      this.server.to(client.id).emit('chatRoomMadeByMe', {
+        room_name: seller_name.user_nick,
+        room_no: new_chat.chat_no,
+      });
+
+      const connected_user = await this.chatService.findConnectedUser(seller);
+
+      if (connected_user) {
+        this.server
+          .to(connected_user.client_id)
+          .emit('chatRoomMadeByOhterUser', {
+            room_name: buyer_name.user_nick,
+            room_no: new_chat.chat_no,
+          });
+      }
+    } else {
+      client.join(`${chat_room.chat_no}`);
+      console.log(client.rooms);
+    }
   }
 }

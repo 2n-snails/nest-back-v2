@@ -17,7 +17,7 @@ export class Chat {
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   content: JSON;
 
   @ManyToOne(() => User, (user) => user.userSeller)

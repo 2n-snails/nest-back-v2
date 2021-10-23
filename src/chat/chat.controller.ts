@@ -23,19 +23,20 @@ export class ChatController {
   @ApiOperation({
     summary: '내가 가진 채팅방목록',
   })
+  @UseGuards(JwtAccessAuthGuard)
   @Get(':user_id/chatRoom')
   async findChatRoom(@Req() req: any, @Param('user_id') user_id: string) {
     const paramUserId = Number(user_id);
     const tokenUserId = req.user.user_no;
 
-    if (!paramUserId === tokenUserId) {
+    if (paramUserId !== tokenUserId) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
     const result = await this.chatService.findAll(tokenUserId);
-    if (!result.length) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
+    // if (!result.length) {
+    //   throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
+    // }
     return result;
   }
 
