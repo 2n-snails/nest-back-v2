@@ -8,12 +8,14 @@
 </head>
 <body>
   <h1 id="my_chat_list">나의 채팅 목록</h1>
-  <div = id="chat">
+  <div id="chat">
     <h1 id="my_chat">채팅창</h1>
+
     <p id="now_chat_room"></p>
+
     <input type="text" id="message" placeholder="메시지 작성하셈"/>
     <input type="hidden" id="room_name" />
-    <button id="send_message" onclick="">전송</button>
+    <button id="send_message" onclick="sendMessage()">전송</button>
     <button id="close_room">현재 채팅방 나가기</button>
   </div>
 </body>
@@ -23,7 +25,7 @@
   window.onload = function () {
     let config = {
       headers: {
-        "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoyLCJpYXQiOjE2MzQ5NjgzNDQsImV4cCI6MTYzNDk3MTk0NH0.kqbrVh9Mmp3OdAk8fvfYC2qv9OeTLkYrnSohjtbZSjo",
+        "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoyLCJpYXQiOjE2MzUzMTkzMDAsImV4cCI6MTYzNTMyMjkwMH0.2DjS43BFcQH8dUUZRUDBSUKZLncELgNmIBCR6oCvgXg",
       },
     };
     axios
@@ -34,7 +36,17 @@
         for (let i = 0; i < res.data.length; i++) {
           const p = document.createElement('p');
           p.innerHTML = `${res.data[i].user_nick}과(와) 의 채팅`;
+          p.id = 'room_name';
           my_chat_list.appendChild(p);
+          
+          const button = document.createElement('button');
+          button.innerHTML = '입장하기';
+          button.id = res.data[i].chat_no;
+          button.value = res.data[i].user_nick;
+          
+          button.addEventListener('click', chatRoomEntry);
+
+          p.appendChild(button);
         }
       })
       .catch(err => {
@@ -75,7 +87,7 @@
   const socket = io('ws://localhost:4000', {
     transports: ['websocket'],
     auth: {
-      token: "Bearer " + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoyLCJpYXQiOjE2MzQ5NjgzNDQsImV4cCI6MTYzNDk3MTk0NH0.kqbrVh9Mmp3OdAk8fvfYC2qv9OeTLkYrnSohjtbZSjo',
+      token: "Bearer " + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25vIjoyLCJpYXQiOjE2MzUzMTkzMDAsImV4cCI6MTYzNTMyMjkwMH0.2DjS43BFcQH8dUUZRUDBSUKZLncELgNmIBCR6oCvgXg',
     },
   });
 
@@ -87,15 +99,52 @@
     h5.innerHTML = `${data.room_name}과(와) 의 채팅`;
 
     h1.appendChild(h5);
+    const button = document.createElement('button');
+    button.innerHTML = '입장하기';
+    button.onclick = chatRoomEntry;
+    h5.appendChild(button);
+  });
 
-    const chat_name = document.getElementById('my_chat');
+  socket.on('onMessage', (data) => {
+    console.log(data);
+  });
+
+  socket.on('chatRoomMadeByOhterUser', (data) => {
+    console.log('다른 사람이 나한테 채팅방을 만들었음');
+    const h1 = document.getElementById('my_chat_list');
+    const h5 = document.createElement('h5');
+    h5.innerHTML = `${data.room_name}과(와) 의 채팅`;
+
+    h1.appendChild(h5);
+    const button = document.createElement('button');
+    button.innerHTML = '입장하기';
+    h5.appendChild(button);
+  });
+
+
+  const chatRoomEntry = (event) => {
+    console.log('button event');
+    console.log(event.target.id);
+    console.log(event.target.value);
+    const chat_no = event.target.id;
+    const user_nick = event.target.value;
 
     const p = document.getElementById('now_chat_room');
-    p.innerHTML = `${data.room_name}과 채팅중`;
-    chat_name.appendChild(p);
+    p.innerHTML = `${user_nick}와 채팅중`;
 
-    const input = document.getElementById('room_name');
-    input.value = data.room_no;
-  });
+    const chat_name = document.getElementById('room_name');
+    chat_name.value = chat_no;
+
+    // 소켓 룸으로 이동 혹은 새로운 룸 생성되게 <- 기존 채팅 목록에서 채팅방에 입장한다면
+    socket.emit('joinRoom', chat_no);
+  }
+
+  const sendMessage = () => {
+    const message = document.getElementById('message').value;
+
+    const chat_no = document.getElementById('room_name').value;
+    
+    socket.emit('sendMessage', message, chat_no);
+  }
 </script>
 </html>

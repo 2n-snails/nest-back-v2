@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
+import { Any } from 'typeorm';
 import { ChatService } from './chat.service';
 
 // 특정 사용자 끼리만 채팅이 가능하도록 설계
@@ -43,9 +44,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // TODO: 새로운 채팅방 열릴 때
   // TODO: 열려있는 채팅방에 들어갈때
   // TODO: 유저 둘 끼리 메시지 보내주기
-  @SubscribeMessage('message')
+  @SubscribeMessage('sendMessage')
   handleEvent(@MessageBody() data: string): void {
-    this.server.emit('message', data);
+    // this.server.emit('message', data);
+    console.log(data);
+    const [message, chat_no] = data;
+    this.server.to(chat_no).emit('onMessage', message);
   }
 
   @SubscribeMessage('createNewChatRoom')
@@ -88,5 +92,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.join(`${chat_room.chat_no}`);
       console.log(client.rooms);
     }
+  }
+
+  // 대화목록 창에서 클릭하면 바로 룸을 생성하고 룸이 생성되있다면 룸으로 넣어준다.
+  @SubscribeMessage('joinRoom')
+  async joinRooms(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    // data === chat_no;
+    console.dir(client.rooms);
+    console.log(client.rooms.has(data));
+    client.join(data);
+    console.dir(client.rooms);
   }
 }
