@@ -32,12 +32,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.handshake.auth.token,
     );
     await this.chatService.pushSocketServer(user.user_no, client.id);
-    console.log('connected');
+    // console.log('connected');
   }
   // 소켓 연결 해제시
   async handleDisconnect(client: any) {
     await this.chatService.deleteSocketServer(client.id);
-    console.log('disconnected');
+    // console.log('disconnected');
   }
 
   // TODO: 새로운 채팅방 열릴 때
@@ -46,7 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendMessage')
   handleEvent(@MessageBody() data: string): void {
     // this.server.emit('message', data);
-    console.log(data);
+    // console.log(data);
     const [message, chat_no] = data;
     this.server.to(chat_no).emit('onMessage', message);
   }
@@ -67,7 +67,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         buyer,
         product,
       );
-      console.log(new_chat);
+      // console.log(new_chat);
       client.join(`${new_chat.chat_no}`);
 
       // 새로운 채팅 목록 프론트로 보내기
@@ -89,7 +89,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     } else {
       client.join(`${chat_room.chat_no}`);
-      console.log(client.rooms);
+      // console.log(client.rooms);
     }
   }
 
@@ -97,9 +97,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinRoom')
   async joinRooms(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
     // data === chat_no;
-    console.dir(client.rooms);
-    console.log(client.rooms.has(data));
+    // console.dir(client.rooms);
+    // console.log(client.rooms.has(data));
     client.join(data);
-    console.dir(client.rooms);
+    // console.dir(client.rooms);
   }
 }
