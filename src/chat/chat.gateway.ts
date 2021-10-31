@@ -9,7 +9,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/user.service';
-import { Any } from 'typeorm';
 import { ChatService } from './chat.service';
 
 // 특정 사용자 끼리만 채팅이 가능하도록 설계
