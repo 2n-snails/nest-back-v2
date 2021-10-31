@@ -12,12 +12,12 @@ import {
 @Entity()
 export class Chat {
   @PrimaryGeneratedColumn()
-  area_no: number;
+  chat_no: number;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   content: JSON;
 
   @ManyToOne(() => User, (user) => user.userSeller)
